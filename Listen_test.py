@@ -32,9 +32,10 @@ async def Wsdemo():
                 EventName = EventJson["CurrentPacket"]["EventName"]
                 EventData = EventJson["CurrentPacket"]["EventData"]
 
-                print(f"<{EventData}+\n")
+                print(f"<{EventData}\n")
                 if Event(EventJson).getEventData().Content() is not None:
                     print(Event(EventJson).getEventData().Content() + "\n")
+                    print(Event(EventJson).getEventData().FromUin())
 
     except Exception as e:
         # 断线重连

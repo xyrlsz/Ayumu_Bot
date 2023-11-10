@@ -26,12 +26,12 @@ else:
     login_QQ(get_config)
 
 
-# new_dict_array = [
-#     {"Nick": "XYR⊙LSZ ", "Uin": 2434221948},
-# ]
+new_dict_array = [
+    {"Nick": "XYR⊙LSZ ", "Uin": 2434221948},
+]
 
-# message = TextMessage(797649367, 2, "shabi", new_dict_array)
-
+message = TextMessage(797649367, 2, "shabi", new_dict_array)
+send_message(message)
 # img_file = UpFile(2, "FilePath", "QR.png")
 # img_message = ImageMessage(
 #     797649367,
@@ -124,6 +124,8 @@ else:
 #     "ver": "0.0.0.1",
 #     "view": "music",
 # }
+
+
 # card_str = json.dumps(card)
 
 # send_message(CardMessage(2434221948, 1, card_str))
