@@ -14,7 +14,7 @@ class EventData:
     def FromType(self) -> int:
         return self.__body["MsgHead"]["FromType"]
 
-    def SenderUin(self) -> int:
+    def SenderUin(self):
         return self.__body["MsgHead"]["SenderUin"]
 
     def SenderNick(self) -> str:
