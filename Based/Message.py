@@ -11,16 +11,26 @@ class TextMessage:
                 },
             }
         else:
-            self.__body = {
+            if AtUinLists is not None:
+                self.__body = {
+                    "CgiCmd": "MessageSvc.PbSendMsg",
+                    "CgiRequest": {
+                        "ToUin": receiver,
+                        "ToType": type,
+                        "Content": " " + message,
+                        "AtUinLists": [],
+                    },
+                }
+                self.__body["CgiRequest"]["AtUinLists"].extend(AtUinLists)
+            else :
+                self.__body = {
                 "CgiCmd": "MessageSvc.PbSendMsg",
                 "CgiRequest": {
-                    "ToUin": receiver,
-                    "ToType": type,
-                    "Content": " " + message,
-                    "AtUinLists": [],
+                    "ToUin": receiver,  # Replace 88888888 with the actual receiver
+                    "ToType": type,  # 2 for group; 3 for private chat
+                    "Content": message,
                 },
             }
-            self.__body["CgiRequest"]["AtUinLists"].extend(AtUinLists)
 
     def get_body(self):
         return self.__body

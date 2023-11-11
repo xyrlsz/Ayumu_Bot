@@ -5,6 +5,6 @@ from io import BytesIO
 
 exe_path = "./OPQBot"
 command = "-token"
-tokne = "7b4909d1b1af2dcaa46a28250d4f6de8"
+tokne = "9846bd208263a32987069f0d87828b58"
 
 subprocess.call([exe_path, command, tokne])

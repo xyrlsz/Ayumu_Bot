@@ -30,7 +30,10 @@ new_dict_array = [
     {"Nick": "XYR⊙LSZ ", "Uin": 2434221948},
 ]
 
-message = TextMessage(797649367, 2, "shabi", new_dict_array)
+# message = TextMessage(797649367, 2, "shabi", new_dict_array)
+
+message = TextMessage(797649367, 2, "shabi")
+
 send_message(message)
 # img_file = UpFile(2, "FilePath", "QR.png")
 # img_message = ImageMessage(
