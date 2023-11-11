@@ -48,10 +48,10 @@ async def send_animetext(message: Event):
             content = message.getEventData().Content()
             if content :
                 last_index = content.rfind("真寻")
+                
                 ask = content[last_index + len("真寻") :]
-                if last_index == -1 and message.getEventData().FromType() != 2:
-                    ask = content
-
+                # if  message.getEventData().FromType() != 2 and last_index == -1:
+                #     ask = content
                 if ask.strip() :
                     mesg = AnimeText(ask)
                 else:
@@ -74,7 +74,7 @@ async def send_animetext(message: Event):
                                 "Uin": message.getEventData().SenderUin(),
                             },
                         ]
-                        if str(receiver) != str(QQBotUid):
+                        if str(receiver) != str(QQBotUid) and content.rfind("真寻")>-1 :
                             send_message(
                                 TextMessage(
                                     message.getEventData().FromUin(),
