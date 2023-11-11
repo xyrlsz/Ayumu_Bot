@@ -13,7 +13,7 @@ from Based.Message import CardMessage
 from Based.Message import TextMessage
 
 
-def send_song(message: Event):
+async def send_song(message: Event):
     receiver = message.getEventData().SenderUin()
     if message.getEventData().FromUin() is not None:
         content = message.getEventData().Content()
