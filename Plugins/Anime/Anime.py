@@ -50,8 +50,8 @@ async def send_animetext(message: Event):
                 last_index = content.rfind("真寻")
                 
                 ask = content[last_index + len("真寻") :]
-                # if  message.getEventData().FromType() != 2 and last_index == -1:
-                #     ask = content
+                if  message.getEventData().FromType() != 2 and last_index == -1:
+                    ask = content
                 if ask.strip() :
                     mesg = AnimeText(ask)
                 else:
