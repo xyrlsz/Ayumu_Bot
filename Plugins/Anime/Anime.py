@@ -60,18 +60,11 @@ async def send_animetext(message: Event):
             content = message.getEventData().Content()
             if content:
                 last_index = content.rfind("真寻")
-<<<<<<< HEAD
-                ask = content[last_index + len("真寻") :]
-                if  message.getEventData().FromType() != 2 and last_index == -1:
-                    ask = content
-                if ask.strip() :
-=======
 
                 ask = content[last_index + len("真寻") :]
                 if message.getEventData().FromType() != 2 and last_index == -1:
                     ask = content
                 if ask.strip():
->>>>>>> develop
                     mesg = AnimeText(ask)
                 else:
                     mesg = "呼叫小真寻有什么事吗?"
