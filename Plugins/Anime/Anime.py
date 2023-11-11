@@ -9,6 +9,7 @@ from Based.Message import CardMessage
 from Based.Message import TextMessage
 from Based.Config import get_config
 import asyncio
+
 config = "Config/config.yaml"
 config_data = get_config(config)  # Renamed the variable to avoid conflict
 Host = config_data["Host"]
@@ -17,19 +18,27 @@ devicename = config_data["devicename"]
 Myjson = config_data["json"]
 
 
-def AnimeText(search_string:str) -> str:
+def AnimeText(search_string: str) -> str:
     # 打开本地文件
     if search_string:
         with open("./data/anime.json", "r", encoding="utf-8") as file:
             # 读取并解析json数据
-            data = json.load(file)
+            data0 = json.load(file)
             # 打印数据类型和内容
             # print(type(data))
             # print(data)
-
-        dictionary = data
-        contains_key = any(key in search_string for key in data.keys())
-        matching_key = next((key for key in data.keys() if key in search_string), None)
+        with open("./data/傲娇系二次元bot词库5千词V1.2.json", "r", encoding="utf-8") as file:
+            # 读取并解析json数据
+            data1 = json.load(file)
+        with open("./data/可爱系二次元bot词库1.5万词V1.2.json", "r", encoding="utf-8") as file:
+            # 读取并解析json数据
+            data2 = json.load(file)
+        data = [data0, data1, data2]
+        dictionary = data[random.randint(0, 2)]
+        contains_key = any(key in search_string for key in dictionary.keys())
+        matching_key = next(
+            (key for key in dictionary.keys() if key in search_string), None
+        )
 
         if contains_key and matching_key is not None:
             list_length = len(dictionary[matching_key])
@@ -40,25 +49,26 @@ def AnimeText(search_string:str) -> str:
 
 
 async def send_animetext(message: Event):
-    if message.getEventData().MsgBody() and message.getEventData().FromUin()!=856337734:
+    if (
+        message.getEventData().MsgBody()
+        and message.getEventData().FromUin() != 856337734
+    ):
         print(message.getEventData().MsgBody())
         receiver = message.getEventData().SenderUin()
-        print(str(QQBotUid)+"->"+str(receiver))
-        if message.getEventData().MsgBody() is not None :
+        print(str(QQBotUid) + "->" + str(receiver))
+        if message.getEventData().MsgBody() is not None:
             content = message.getEventData().Content()
-            if content :
+            if content:
                 last_index = content.rfind("真寻")
-                
+
                 ask = content[last_index + len("真寻") :]
-                if  message.getEventData().FromType() != 2 and last_index == -1:
+                if message.getEventData().FromType() != 2 and last_index == -1:
                     ask = content
-                if ask.strip() :
+                if ask.strip():
                     mesg = AnimeText(ask)
                 else:
-
                     mesg = "呼叫小真寻有什么事吗?"
                 if mesg is not None:
-                    
                     if message.getEventData().FromType() != 2:
                         send_message(
                             TextMessage(
@@ -74,7 +84,7 @@ async def send_animetext(message: Event):
                                 "Uin": message.getEventData().SenderUin(),
                             },
                         ]
-                        if str(receiver) != str(QQBotUid) and content.rfind("真寻")>-1 :
+                        if str(receiver) != str(QQBotUid) and content.rfind("真寻") > -1:
                             send_message(
                                 TextMessage(
                                     message.getEventData().FromUin(),
@@ -92,7 +102,7 @@ async def send_animetext(message: Event):
             #     if ask is not None:
             #         mesg = AnimeText(ask)
             #         if mesg is not None:
-                        
+
             #             if message.getEventData().FromType() != 2:
             #                 send_message(
             #                     TextMessage(

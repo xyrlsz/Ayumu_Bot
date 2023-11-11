@@ -115,7 +115,7 @@ async def process_message():
         message = await queue.get()
         # do something with message
         # print(message.getEventData().Content())
-        Todo(message)
+        # Todo(message)
         await send_song(message)
         await send_animetext(message)
         queue.task_done()
