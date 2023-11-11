@@ -54,10 +54,12 @@ else:
 
 
 # websocket client
-SERCIVE_HOST = "127.0.0.1:8086"
+SERCIVE_HOST = Host
 
 # 创建一个异步队列
 queue = asyncio.Queue()
+
+receive_forbidden_list = list(get_config["receive_forbidden"])
 
 
 async def Wsdemo():
@@ -71,7 +73,10 @@ async def Wsdemo():
                 EventData = EventJson["CurrentPacket"]["EventData"]
                 Message = Event(EventJson)
                 # 把Message对象放入队列
-                await queue.put(Message)
+                if int(Message.getEventData().FromUin()) not in receive_forbidden_list:
+                    await queue.put(Message)
+                else:
+                    print("已过滤" + str(Message.getEventData().FromUin()) + "消息")
 
     except Exception as e:
         # 断线重连
