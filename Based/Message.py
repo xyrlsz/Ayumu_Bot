@@ -22,15 +22,15 @@ class TextMessage:
                     },
                 }
                 self.__body["CgiRequest"]["AtUinLists"].extend(AtUinLists)
-            else :
+            else:
                 self.__body = {
-                "CgiCmd": "MessageSvc.PbSendMsg",
-                "CgiRequest": {
-                    "ToUin": receiver,  # Replace 88888888 with the actual receiver
-                    "ToType": type,  # 2 for group; 3 for private chat
-                    "Content": message,
-                },
-            }
+                    "CgiCmd": "MessageSvc.PbSendMsg",
+                    "CgiRequest": {
+                        "ToUin": receiver,  # Replace 88888888 with the actual receiver
+                        "ToType": type,  # 2 for group; 3 for private chat
+                        "Content": message,
+                    },
+                }
 
     def get_body(self):
         return self.__body
@@ -178,29 +178,83 @@ class TextWithImageMessage:
                 },
             }
         else:
-            if file_id is None or Height is None or Width is None:
-                raise ValueError(
-                    "For type 2, file_id, Height, and Width must be provided."
-                )
-            self.__body = {
-                "CgiCmd": "MessageSvc.PbSendMsg",
-                "CgiRequest": {
-                    "ToUin": receiver,
-                    "ToType": 2,
-                    "Content": " " + message,
-                    "AtUinLists": [],
-                    "Images": [
-                        {
-                            "FileId": file_id,
-                            "FileMd5": file_md5,
-                            "FileSize": file_size,
-                            "Height": Height,
-                            "Width": Width,
-                        }
-                    ],
-                },
-            }
-            self.__body["CgiRequest"]["AtUinLists"].extend(AtUinLists)
+            if AtUinLists is not None:
+                self.__body = {
+                    "CgiCmd": "MessageSvc.PbSendMsg",
+                    "CgiRequest": {
+                        "ToUin": receiver,
+                        "ToType": type,
+                        "Content": " " + message,
+                        "Images": [
+                            {
+                                "FileId": file_id,
+                                "FileMd5": file_md5,
+                                "FileSize": file_size,
+                                "Height": Height,
+                                "Width": Width,
+                            }
+                        ],
+                        "AtUinLists": [],
+                    },
+                }
+                self.__body["CgiRequest"]["AtUinLists"].extend(AtUinLists)
+            else:
+                self.__body = {
+                    "CgiCmd": "MessageSvc.PbSendMsg",
+                    "CgiRequest": {
+                        "ToUin": receiver,  # Replace 88888888 with the actual receiver
+                        "ToType": type,  # 2 for group; 3 for private chat
+                        "Content": message,
+                        "Images": [
+                            {
+                                "FileId": file_id,
+                                "FileMd5": file_md5,
+                                "FileSize": file_size,
+                                "Height": Height,
+                                "Width": Width,
+                            }
+                        ],
+                    },
+                }
+        # if type != 2:
+        #     self.__body = {
+        #         "CgiCmd": "MessageSvc.PbSendMsg",
+        #         "CgiRequest": {
+        #             "ToUin": receiver,  # Replace 88888888 with the actual receiver
+        #             "ToType": type,  # 2 for group; 3 for private chat
+        #             "Content": message,
+        #             "Images": [
+        #                 {
+        #                     "FileMd5": file_md5,
+        #                     "FileSize": file_size,
+        #                 }
+        #             ],
+        #         },
+        #     }
+        # else:
+        #     if file_id is None or Height is None or Width is None:
+        #         raise ValueError(
+        #             "For type 2, file_id, Height, and Width must be provided."
+        #         )
+        #     self.__body = {
+        #         "CgiCmd": "MessageSvc.PbSendMsg",
+        #         "CgiRequest": {
+        #             "ToUin": receiver,
+        #             "ToType": 2,
+        #             "Content": " " + message,
+        #             "AtUinLists": [],
+        #             "Images": [
+        #                 {
+        #                     "FileId": file_id,
+        #                     "FileMd5": file_md5,
+        #                     "FileSize": file_size,
+        #                     "Height": Height,
+        #                     "Width": Width,
+        #                 }
+        #             ],
+        #         },
+        #     }
+        #     self.__body["CgiRequest"]["AtUinLists"].extend(AtUinLists)
 
     def get_body(self):
         return self.__body

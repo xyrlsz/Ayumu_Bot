@@ -32,8 +32,10 @@ new_dict_array = [
 
 # message = TextMessage(797649367, 2, "shabi", new_dict_array)
 
-message = TextMessage(797649367, 2, "shabi")
-
+# message = TextMessage(797649367, 2, "shabi")
+message = TextWithImageMessage(
+    797649367, 2, "shabi", "GJS9JXPGY0Tms46AAVoQ2A==", 2493098788, 716, 1146
+)
 send_message(message)
 # img_file = UpFile(2, "FilePath", "QR.png")
 # img_message = ImageMessage(

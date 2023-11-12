@@ -42,6 +42,7 @@ from Based.Message import TextWithImageMessage
 from Based.Message import CardMessage
 from Based.Send_Message import send_message
 from Based.ToUpload_File import UpFile
+from Plugins.Bili.BiliInfo import analysis_Bili
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -117,7 +118,9 @@ async def process_message():
         # print(message.getEventData().Content())
         # Todo(message)
         await send_song(message)
-        await send_animetext(message)
+
+        if await analysis_Bili(message) is not True or None:
+            await send_animetext(message)
         queue.task_done()
 
 
