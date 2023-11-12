@@ -1,7 +1,7 @@
 from bilireq import video
 import json
 import requests
-
+import time
 from datetime import datetime
 import asyncio
 import re
@@ -27,6 +27,9 @@ Host = config_data["Host"]
 QQBotUid = config_data["QQBotUid"]
 devicename = config_data["devicename"]
 Myjson = config_data["json"]
+
+
+
 
 
 def get_Pnum(url):
@@ -293,8 +296,14 @@ async def get_video_info_card(url: str):
     video_info = VideoInfo(info)
     return video_info.video_card(video_P)
 
+last_call_time = 0
 
 async def analysis_Bili(message: Event):
+    global last_call_time
+    # 获取当前时间戳
+    current_time = time.time()
+    if current_time - last_call_time < 10:
+        return True
     Content = message.getEventData().Content()
     is_success = True
     if Content and (("bilibili.com/video" in Content) or ("//b23.tv/" in Content)):
@@ -335,6 +344,7 @@ async def analysis_Bili(message: Event):
                     pic.get_width(),
                 )
             )
+            last_call_time = current_time
             return is_success
         except Exception as e:
             logging.error(f"Error in analysis_Bili: {e}")
