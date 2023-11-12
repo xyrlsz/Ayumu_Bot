@@ -166,6 +166,7 @@ test/
 UsersConf/*
 QR.png 
 hh.sh
+OPOBot*
 OPOBot
 __pycache__/
 Config/config.yaml
