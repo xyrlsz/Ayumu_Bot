@@ -75,7 +75,7 @@ async def Wsdemo():
                 Message = Event(EventJson)
                 # 把Message对象放入队列
                 if int(Message.getEventData().FromUin()) not in receive_forbidden_list:
-                    if int(Message.getEventData().SenderUin()) != QQBotUid: 
+                    if str(Message.getEventData().SenderUin()) != str(QQBotUid): 
                         await queue.put(Message)
                 else:
                     print("已过滤" + str(Message.getEventData().FromUin()) + "消息")
