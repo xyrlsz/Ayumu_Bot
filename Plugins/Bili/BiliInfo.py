@@ -298,6 +298,13 @@ async def get_video_info_card(url: str):
 
 last_call_time = 0
 
+def is_json(data):
+    try:
+        json.loads(data)
+        return True
+    except json.JSONDecodeError:
+        return False
+
 async def analysis_Bili(message: Event):
     global last_call_time
     # 获取当前时间戳
@@ -305,6 +312,9 @@ async def analysis_Bili(message: Event):
     if current_time - last_call_time < 10:
         return True
     Content = message.getEventData().Content()
+    if is_json(str(Content)):
+        parsed_data = json.loads(Content)
+        Content = str(parsed_data)
     is_success = True
     if Content and (("bilibili.com/video" in Content) or ("//b23.tv/" in Content)):
         try:
