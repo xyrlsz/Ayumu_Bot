@@ -120,7 +120,7 @@ async def send_animetext(message: Event):
                             TextMessage(
                                 receiver,
                                 message.getEventData().FromType(),
-                                mesg,
+                                str(mesg),
                             ),
                         )
                     else:
@@ -135,7 +135,7 @@ async def send_animetext(message: Event):
                                 TextMessage(
                                     message.getEventData().FromUin(),
                                     message.getEventData().FromType(),
-                                    mesg,
+                                    str(mesg),
                                     AtUinLists=new_dict_array,
                                 ),
                             )
