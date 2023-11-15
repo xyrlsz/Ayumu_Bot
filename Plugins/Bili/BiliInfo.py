@@ -34,8 +34,8 @@ Myjson = config_data["json"]
 
 def get_Pnum(url):
     # Define the regular expression pattern
-    pattern = r"\?p=(\d+)&"
-
+    # pattern = r"\?p=(\d+)&"
+    pattern = r"p=(\d+)&"
     # Use re.search to find the match
     match = re.search(pattern, url)
 
@@ -244,7 +244,7 @@ class VideoInfo:
 简介：{video_desc} 
         """
 
-        return mesg
+        return mesg.strip()
 
 
 logging.basicConfig(level=logging.INFO)
@@ -316,9 +316,13 @@ async def analysis_Bili(message: Event):
         parsed_data = json.loads(Content)
         Content = str(parsed_data)
     is_success = True
-    if Content and (("bilibili.com/video" in Content) or ("//b23.tv/" in Content)):
+
+    if Content and (("bilibili.com/video" in Content) or ("b23.tv" in Content)):
+        if Content.find("\/"):
+            Content.replace("\/", "/")
+            
         try:
-            if "b23.tv/" in Content:
+            if "b23.tv" in Content:
                 id_and_p = get_short_url_idAndPnum(extract_b23_tv_string(Content))
                 if id_and_p[1] is None:
                     url_text = (
@@ -349,9 +353,9 @@ async def analysis_Bili(message: Event):
                     Type,
                     card,
                     pic.get_file_md5(),
-                    pic.get_file_id(),
-                    pic.get_height(),
-                    pic.get_width(),
+                    pic.get_file_id()
+                    # pic.get_height(),
+                    # pic.get_width(),
                 )
             )
             last_call_time = current_time
