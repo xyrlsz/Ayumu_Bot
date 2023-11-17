@@ -1,4 +1,4 @@
---[[v6.9.6]]
+
 local log = require("log")
 local Api = require("coreApi")
 local json = require("json")
@@ -11,18 +11,6 @@ function Api_LuaCaller(CurrentQQ, funcName, data)
     local switch = {
         ["MagicCgiCmd"] = function()
             return Api.Api_MagicCgiCmd(CurrentQQ, data)
-        end,
-        --添加定时任务
-        ["AddCrons"] = function()
-            return Api.Api_AddCrons(data)
-        end,
-        --添加删除定时任务
-        ["DelCrons"] = function()
-            return Api.Api_DelCrons(data.TaskID)
-        end,
-        --获取任务列表
-        ["GetCrons"] = function()
-            return Api.Api_GetCrons()
         end
     }
     local fSwitch = switch[funcName] --switch func
