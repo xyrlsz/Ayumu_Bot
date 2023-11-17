@@ -98,8 +98,16 @@ def AnimeText(search_string: str) -> str:
         # dictionary = data[random.randint(0, 2)]
         dictionary = animedata
         contains_key = any(key in search_string for key in dictionary.keys())
+        # matching_key = next(
+        #     (key for key in dictionary.keys() if key in search_string and key != ""), ""
+        # )
         matching_key = next(
-            (key for key in dictionary.keys() if key in search_string), None
+            (
+                key
+                for key in sorted(dictionary.keys(), key=len, reverse=True)
+                if key in search_string and key != ""
+            ),
+            "",
         )
 
         if contains_key and matching_key is not None:
@@ -131,7 +139,7 @@ async def send_animetext(message: Event):
                 else:
                     mesg = "呼叫小真寻有什么事吗?"
                 if mesg is not None:
-                    print(str(mesg))
+                    # print(str(mesg))
                     if message.getEventData().FromType() != 2:
                         send_message(
                             TextMessage(
