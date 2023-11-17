@@ -29,9 +29,6 @@ devicename = config_data["devicename"]
 Myjson = config_data["json"]
 
 
-
-
-
 def get_Pnum(url):
     # Define the regular expression pattern
     # pattern = r"\?p=(\d+)&"
@@ -296,7 +293,9 @@ async def get_video_info_card(url: str):
     video_info = VideoInfo(info)
     return video_info.video_card(video_P)
 
+
 last_call_time = 0
+
 
 def is_json(data):
     try:
@@ -304,6 +303,7 @@ def is_json(data):
         return True
     except json.JSONDecodeError:
         return False
+
 
 async def analysis_Bili(message: Event):
     global last_call_time
@@ -317,10 +317,10 @@ async def analysis_Bili(message: Event):
         Content = str(parsed_data)
     is_success = True
 
-    if Content and (("bilibili.com/video" in Content) or ("b23.tv" in Content)):
+    if Content and (("bilibili.com" in Content) or ("b23.tv" in Content)):
         if Content.find("\/"):
             Content.replace("\/", "/")
-            
+
         try:
             if "b23.tv" in Content:
                 id_and_p = get_short_url_idAndPnum(extract_b23_tv_string(Content))

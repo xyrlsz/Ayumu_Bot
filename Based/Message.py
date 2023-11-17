@@ -92,7 +92,7 @@ class ImageMessage:
             # if file_size is not None:
             #     self.__body["CgiRequest"]["Images"][0]["FileSize"] = file_size
         else:
-            if file_id is None or Height is None or Width is None:
+            if file_id is None:
                 raise ValueError(
                     "For type 2, file_id, Height, and Width must be provided."
                 )

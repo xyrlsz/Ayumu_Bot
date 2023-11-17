@@ -18,8 +18,7 @@ devicename = config_data["devicename"]
 Myjson = config_data["json"]
 
 
-def random_dict(my_dict:dict):
-    
+def random_dict(my_dict: dict):
     shuffled_keys = list(my_dict.keys())
     random.shuffle(shuffled_keys)
 
@@ -33,7 +32,23 @@ def merge_dicts(dict1, dict2):
 
     for key, value in dict2.items():
         if key in merged_dict:
-            merged_dict[key] = [merged_dict[key], value] if not isinstance(merged_dict[key], list) else merged_dict[key] + [value]
+            # merged_dict[key] = [merged_dict[key], value]
+            # if not isinstance(merged_dict[key], list):
+
+            # else: merged_dict[key] + [value]
+            if isinstance(merged_dict[key], list):
+                if isinstance(value, list):
+                    merged_dict[key] = merged_dict[key] + value
+                else:
+                    merged_dict[key].append(value)
+            else:
+                if isinstance(value, list):
+                    # merged_dict[key] = merged_dict[key] + value
+                    merged_dict[key] = value.append(merged_dict[key])
+                else:
+                    # merged_dict[key].append(value)
+                    merged_dict[key] = [merged_dict[key], value]
+
         else:
             merged_dict[key] = value
 
@@ -53,18 +68,19 @@ def get_anmime_text():
     with open("./data/可爱系二次元bot词库1.5万词V1.2.json", "r", encoding="utf-8") as file:
         # 读取并解析json数据
         data2 = json.load(file)
-    
-    tmp = merge_dicts(data0,data1)
-    return merge_dicts(tmp,data2)
-    
 
-# animedata = random_dict(get_anmime_text())    
+    tmp = merge_dicts(data0, data1)
+    return merge_dicts(tmp, data2)
+
+
+# animedata = random_dict(get_anmime_text())
+
 
 # print(animedata)
 def AnimeText(search_string: str) -> str:
     # 打开本地文件
     # global animedata
-    animedata = random_dict(get_anmime_text())    
+    animedata = random_dict(get_anmime_text())
     if search_string:
         # with open("./data/anime.json", "r", encoding="utf-8") as file:
         #     # 读取并解析json数据
@@ -115,6 +131,7 @@ async def send_animetext(message: Event):
                 else:
                     mesg = "呼叫小真寻有什么事吗?"
                 if mesg is not None:
+                    print(str(mesg))
                     if message.getEventData().FromType() != 2:
                         send_message(
                             TextMessage(
@@ -137,8 +154,9 @@ async def send_animetext(message: Event):
                                     message.getEventData().FromType(),
                                     str(mesg),
                                     AtUinLists=new_dict_array,
-                                ),
+                                )
                             )
+
             # if content and last_index != -1:
             #     ask = content[last_index + len("真寻"):]
             #     print()

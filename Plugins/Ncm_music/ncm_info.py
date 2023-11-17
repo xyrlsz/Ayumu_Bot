@@ -18,4 +18,5 @@ def get_song_info(song_id: int) -> dict:
     url = api_url + "song/detail?ids=" + str(song_id)
     return post_request(url)["songs"][0]
 
+
 # print(get_song_info(347230))
