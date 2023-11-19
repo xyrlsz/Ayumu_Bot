@@ -1,4 +1,5 @@
-from bilireq import video
+# from bilireq import video
+from bilibili_api import video
 import json
 import requests
 import time
@@ -45,24 +46,33 @@ def get_Pnum(url):
         return None
 
 
-def get_Id(url):
+def get_Id(url) -> Union[int, str]:
     # Define the regular expression pattern
-    pattern = r"/video/([^/]+)"
+    pattern = r"/video/(.*?)/"
 
     # Use re.search to find the match
     match = re.search(pattern, url)
 
     # Check if a match is found
     if match:
-        # Extract the characters after "/video/"
+        # Extract the characters between "/video/" and "/"
         extracted_chars = match.group(1)
-        return extracted_chars
 
-    return None
+        # Check if the extracted_chars start with "BV"
+        if extracted_chars.startswith("BV"):
+            return extracted_chars
+        else:
+            return int(extracted_chars[2:])
+    else:
+        return None
 
 
 async def get_info(video_id: Union[int, str]):
-    info = await video.get_video_base_info(video_id)
+    if type(video_id) == str:
+        get_video = video.Video(bvid=video_id)
+    else:
+        get_video = video.Video(aid=video_id)
+    info = await get_video.get_info()
     return info
 
 
@@ -305,6 +315,52 @@ def is_json(data):
         return False
 
 
+def get_av_id_in_text(input_string):
+    # 找到"av"在字符串中的位置
+    start_index = input_string.find("av")
+
+    # 如果找到了"av"
+    if start_index != -1:
+        # 从"av"的位置开始遍历字符串，直到遇到不是数字的字符为止
+        av_id = "av"
+        for char in input_string[start_index + len("av") :]:
+            if char.isdigit():
+                av_id += char
+            else:
+                break
+        return av_id
+    else:
+        return None
+
+
+def get_bv_id_in_text(input_string):
+    # 找到"av"在字符串中的位置
+    start_index = input_string.find("BV")
+
+    # 如果找到了"av"
+    if start_index != -1:
+        # 从"av"的位置开始遍历字符串，直到遇到不是数字的字符为止
+        bv_id = "BV"
+        for char in input_string[start_index + len("BV") :]:
+            if char.isdigit() or char.isalpha():
+                bv_id += char
+            else:
+                break
+        return bv_id
+    else:
+        return None
+
+
+# # 测试函数
+# input_string = "视频的id是av1234565，看看"
+# result = extract_av_id(input_string)
+
+# if result is not None:
+#     print("提取的av ID:", result)
+# else:
+#     print("未找到'av'")
+
+
 async def analysis_Bili(message: Event):
     global last_call_time
     # 获取当前时间戳
@@ -317,49 +373,77 @@ async def analysis_Bili(message: Event):
         Content = str(parsed_data)
     is_success = True
 
-    if Content and (("bilibili.com" in Content) or ("b23.tv" in Content)):
-        if Content.find("\/"):
-            Content.replace("\/", "/")
+    if Content:
+        if ("bilibili.com" in Content) or ("b23.tv" in Content):
+            if Content.find("\/"):
+                Content.replace("\/", "/")
+            try:
+                if "b23.tv" in Content:
+                    id_and_p = get_short_url_idAndPnum(extract_b23_tv_string(Content))
+                    if id_and_p[1] is None:
+                        url_text = (
+                            "https://www.bilibili.com/video/" + str(id_and_p[0]) + "/"
+                        )
+                    else:
+                        url_text = (
+                            "https://www.bilibili.com/video/"
+                            + str(id_and_p[0])
+                            + "/?p="
+                            + str(id_and_p[1])
+                            + "/"
+                        )
 
-        try:
-            if "b23.tv" in Content:
-                id_and_p = get_short_url_idAndPnum(extract_b23_tv_string(Content))
-                if id_and_p[1] is None:
-                    url_text = (
-                        "https://www.bilibili.com/video/" + str(id_and_p[0]) + "/"
-                    )
                 else:
-                    url_text = (
-                        "https://www.bilibili.com/video/"
-                        + str(id_and_p[0])
-                        + "/?p="
-                        + str(id_and_p[1])
-                        + "/"
+                    url_text = Content
+                print(url_text)
+                card = await get_video_info_card(url_text)
+                pic_url = await get_video_pic(url_text)
+                receiver = message.getEventData().FromUin()
+                Type = message.getEventData().FromType()
+                logging.info(f"Card: {card}")
+                logging.info(f"Pic URL: {pic_url}")
+                pic = UpFile(Type, "FileUrl", pic_url)
+                send_message(
+                    TextWithImageMessage(
+                        receiver,
+                        Type,
+                        card,
+                        pic.get_file_md5(),
+                        pic.get_file_id()
+                        # pic.get_height(),
+                        # pic.get_width(),
                     )
-
-            else:
-                url_text = Content
-            print(url_text)
-            card = await get_video_info_card(url_text)
-            pic_url = await get_video_pic(url_text)
-            receiver = message.getEventData().FromUin()
-            Type = message.getEventData().FromType()
-            logging.info(f"Card: {card}")
-            logging.info(f"Pic URL: {pic_url}")
-            pic = UpFile(Type, "FileUrl", pic_url)
-            send_message(
-                TextWithImageMessage(
-                    receiver,
-                    Type,
-                    card,
-                    pic.get_file_md5(),
-                    pic.get_file_id()
-                    # pic.get_height(),
-                    # pic.get_width(),
                 )
-            )
-            last_call_time = current_time
-            return is_success
-        except Exception as e:
-            logging.error(f"Error in analysis_Bili: {e}")
-            return False
+                last_call_time = current_time
+                return is_success
+            except Exception as e:
+                logging.error(f"Error in analysis_Bili: {e}")
+                return False
+
+        elif ("av" in Content) or ("BV" in Content):
+            vid = get_av_id_in_text(Content) or get_bv_id_in_text(Content)
+            url_text = "https://www.bilibili.com/video/" + vid + "/"
+            try:
+                card = await get_video_info_card(url_text)
+                pic_url = await get_video_pic(url_text)
+                receiver = message.getEventData().FromUin()
+                Type = message.getEventData().FromType()
+                logging.info(f"Card: {card}")
+                logging.info(f"Pic URL: {pic_url}")
+                pic = UpFile(Type, "FileUrl", pic_url)
+                send_message(
+                    TextWithImageMessage(
+                        receiver,
+                        Type,
+                        card,
+                        pic.get_file_md5(),
+                        pic.get_file_id()
+                        # pic.get_height(),
+                        # pic.get_width(),
+                    )
+                )
+                last_call_time = current_time
+                return is_success
+            except Exception as e:
+                logging.error(f"Error in analysis_Bili: {e}")
+                return False

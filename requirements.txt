@@ -6,3 +6,4 @@ pyyaml
 websockets
 bilireq
 qrcode
+bilibili-api-python
