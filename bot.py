@@ -33,10 +33,10 @@ new_dict_array = [
 # message = TextMessage(797649367, 2, "shabi", new_dict_array)
 
 # message = TextMessage(797649367, 2, "shabi")
-message = TextWithImageMessage(
-    797649367, 2, "shabi", "GJS9JXPGY0Tms46AAVoQ2A==", 2493098788, 716, 1146
-)
-send_message(message)
+# message = TextWithImageMessage(
+#     797649367, 2, "shabi", "GJS9JXPGY0Tms46AAVoQ2A==", 2493098788, 716, 1146
+# )
+# send_message(message)
 # img_file = UpFile(2, "FilePath", "QR.png")
 # img_message = ImageMessage(
 #     797649367,
@@ -91,46 +91,46 @@ send_message(message)
 # send_message(TextWithImageMessage(2434221948, 1, "你好", img.get_file_md5()))
 
 
-# card = {
-#     "app": "com.tencent.structmsg",
-#     "config": {
-#         "ctime": 1699495141,
-#         "forward": 1,
-#         "token": "07708301a3f6616a96d3658d0a2a9043",
-#         "type": "normal",
-#     },
-#     "desc": "音乐",
-#     "extra": {
-#         "app_type": 1,
-#         "appid": 100495085,
-#         "msg_seq": 11404322491231877251,
-#         "uin": 3466484185,
-#     },
-#     "meta": {
-#         "music": {
-#             "action": "",
-#             "android_pkg_name": "",
-#             "app_type": 1,
-#             "appid": 100495085,
-#             "ctime": 1699495141,
-#             "desc": "TimeZ",
-#             "jumpUrl": "https://music.163.com/song/?id=26136982",
-#             "musicUrl": "https://music.163.com/song/media/outer/url?id=26136982",
-#             "preview": "http://p1.music.126.net/eHDlGwuBmiL7Kt45dWfxWQ==/2399134371831535.jpg",
-#             "sourceMsgId": "0",
-#             "source_icon": "https://i.gtimg.cn/open/app_icon/00/49/50/85/100495085_100_m.png",
-#             "source_url": "",
-#             "tag": "网易云音乐",
-#             "title": "偶像万万岁",
-#             "uin": 3466484185,
-#         }
-#     },
-#     "prompt": "[分享]偶像万万岁",
-#     "ver": "0.0.0.1",
-#     "view": "music",
-# }
+card = {
+    "app": "com.tencent.structmsg",
+    # "config": {
+    #     "ctime": 1700108202,
+    #     "forward": 1,
+    #     "token": "d3e07056a2ad60271da4dd715dcca020",
+    #     "type": "normal",
+    # },
+    "desc": "音乐",
+    "extra": {
+        "app_type": 1,
+        "appid": 100495085,
+        "msg_seq": 5882158776524690553,
+        "uin": 3466484185,
+    },
+    "meta": {
+        "music": {
+            "action": "",
+            "android_pkg_name": "",
+            "app_type": 1,
+            "appid": 100495085,
+            "ctime": 1700108202,
+            "desc": "尤长靖",
+            "jumpUrl": "https://music.163.com/song/?id=2099338221",
+            "musicUrl": "https://music.163.com/song/media/outer/url?id=2099338221",
+            "preview": "http://p2.music.126.net/Qxm3vHR_p0R-0m944NYGeg==/109951169052573329.jpg",
+            "sourceMsgId": "0",
+            "source_icon": "https://i.gtimg.cn/open/app_icon/00/49/50/85/100495085_100_m.png",
+            "source_url": "",
+            "tag": "网易云音乐",
+            "title": "昨日青空",
+            "uin": 3466484185,
+        }
+    },
+    "prompt": "[分享]昨日青空",
+    "ver": "0.0.0.1",
+    "view": "music",
+}
 
 
-# card_str = json.dumps(card)
+card_str = json.dumps(card)
 
-# send_message(CardMessage(2434221948, 1, card_str))
+send_message(CardMessage(2434221948, 1, card_str))
