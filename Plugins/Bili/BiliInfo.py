@@ -33,7 +33,7 @@ Myjson = config_data["json"]
 def get_Pnum(url):
     # Define the regular expression pattern
     # pattern = r"\?p=(\d+)&"
-    pattern = r"p=(\d+)"
+    pattern = r"\?p=(\d+)"
     # Use re.search to find the match
     match = re.search(pattern, url)
 
