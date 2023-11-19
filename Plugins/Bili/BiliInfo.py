@@ -48,7 +48,7 @@ def get_Pnum(url):
 
 def get_Id(url) -> Union[int, str]:
     # Define the regular expression pattern
-    pattern = r"/video/(.*?)/"
+    pattern = r"/video/([a-zA-Z0-9]+)"
 
     # Use re.search to find the match
     match = re.search(pattern, url)
