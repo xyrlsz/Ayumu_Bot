@@ -33,7 +33,7 @@ Myjson = config_data["json"]
 def get_Pnum(url):
     # Define the regular expression pattern
     # pattern = r"\?p=(\d+)&"
-    pattern = r"p=(\d+)&"
+    pattern = r"\?p=(\d+)"
     # Use re.search to find the match
     match = re.search(pattern, url)
 
@@ -48,7 +48,7 @@ def get_Pnum(url):
 
 def get_Id(url) -> Union[int, str]:
     # Define the regular expression pattern
-    pattern = r"/video/(.*?)/"
+    pattern = r"/video/([a-zA-Z0-9]+)"
 
     # Use re.search to find the match
     match = re.search(pattern, url)
@@ -67,16 +67,32 @@ def get_Id(url) -> Union[int, str]:
         return None
 
 
-async def get_info(video_id: Union[int, str]):
+# url = "https://www.bilibili.com/video/BV1fa4y1m7X6/?vd_source=1792e8631cd8791dcb70b57ee193de37"
+
+
+# def get_Id(url):
+#     # Define the regular expression pattern
+#     pattern = r"/video/([^/]+)|/av(\d+)"
+
+#     # Use re.search to find the match
+#     match = re.search(pattern, url)
+
+#     # Check if a match is found
+#     if match:
+#         # Extract the characters after "/video/" or "/av"
+#         extracted_chars = match.group(1) or match.group(2)
+#         return extracted_chars
+
+#     return None
+
+
+async def get_info(video_id: Union[int, str]) -> dict:
     if type(video_id) == str:
         get_video = video.Video(bvid=video_id)
     else:
         get_video = video.Video(aid=video_id)
     info = await get_video.get_info()
-    return info
-
-
-# info = asyncio.run(get_info())
+    return dict(info)
 
 
 def timestamp_to_date(timestamp, format="%Y-%m-%d %H:%M:%S") -> str:
@@ -135,7 +151,10 @@ class VideoInfo:
         self.__title = data.get("title")
         self.__pubdate = data.get("pubdate")
         self.__desc = data.get("desc")
-        self.__desc_v2 = data.get("desc_v2")[0]["raw_text"]
+        try:
+            self.__desc_v2 = data.get("desc_v2")[0]["raw_text"]
+        except:
+            self.__desc_v2 = None
         self.__owner = data.get("owner")
         self.__dynamic = data.get("dynamic")
         self.__owner_name = data.get("owner")["name"]
@@ -261,12 +280,22 @@ def extract_b23_tv_string(url):
     # 使用正则表达式提取目标字符串
     if url is None:
         return None
-    pattern = r"b23\.tv/([^\s/?]+)"
+    # pattern = r"b23\.tv/([^\s/?]+)"
+    pattern = r"b23\.tv/([a-zA-Z0-9]+)"
     match = re.search(pattern, url)
 
     if match:
         return "https://" + str(match.group(0))
     else:
+        # if url.find("b23.tv/"):
+        #     index = url.find("b23.tv/") + len("b23.tv/")
+        #     tmp = ""
+        #     for char in url[index:]:
+        #         if char.isdigit() or char.isalpha():
+        #             tmp += char
+        #         else:
+        #             break
+        #     return "https://" + tmp
         return None
 
 
@@ -374,9 +403,17 @@ async def analysis_Bili(message: Event):
     is_success = True
 
     if Content:
+        # print("调试")
+        # print(Content)
+        Content = str(Content)
         if ("bilibili.com" in Content) or ("b23.tv" in Content):
-            if Content.find("\/"):
-                Content.replace("\/", "/")
+            # if Content.find("\\/"):
+            #     Content.replace("\\/", "/")
+            # try:
+            #     Content = str(json.dumps(json.loads(Content)))
+            # except:
+            #     Content
+            # # print(Content)
             try:
                 if "b23.tv" in Content:
                     id_and_p = get_short_url_idAndPnum(extract_b23_tv_string(Content))

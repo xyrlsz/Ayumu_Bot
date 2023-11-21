@@ -2,18 +2,20 @@
 name = "mybot"
 version = "0.1.0"
 description = ""
-authors = ["xyrlsz <2434221948@qq.com>"]
+authors = ["xyrlsz"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+bilibili-api-python = "^16.1.1"
 requests = "^2.31.0"
 asyncio = "^3.4.3"
-Pillow = "^10.1.0"
-pyyaml = "^6.0.1"
 pyjson = "^1.4.1"
-pybase64 = "^1.3.1"
-websockets = "^12.0"  # Replace X.X.X with the desired version of websockets
+pyyaml = "^6.0.1"
+websockets = "^12.0"
+qrcode = "^7.4.2"
+
+
 
 [build-system]
 requires = ["poetry-core"]
