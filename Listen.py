@@ -43,6 +43,7 @@ from Based.Message import CardMessage
 from Based.Send_Message import send_message
 from Based.ToUpload_File import UpFile
 from Plugins.Bili.BiliInfo import analysis_Bili
+from Plugins import NoRepeating
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -75,7 +76,7 @@ async def Wsdemo():
                 Message = Event(EventJson)
                 # 把Message对象放入队列
                 if int(Message.getEventData().FromUin()) not in receive_forbidden_list:
-                    if str(Message.getEventData().SenderUin()) != str(QQBotUid): 
+                    if str(Message.getEventData().SenderUin()) != str(QQBotUid):
                         await queue.put(Message)
                 else:
                     print("已过滤" + str(Message.getEventData().FromUin()) + "消息")
@@ -114,7 +115,7 @@ def Todo(message: Event):
 async def process_message():
     # 从队列里取出Message对象并处理
     while True:
-        message = await queue.get()
+        message: Event = await queue.get()
         # do something with message
         # print(message.getEventData().Content())
         # Todo(message)
@@ -122,6 +123,7 @@ async def process_message():
 
         if await analysis_Bili(message) is not True or None:
             await send_animetext(message)
+        await NoRepeating.RemoveMsg(message)
         queue.task_done()
 
 

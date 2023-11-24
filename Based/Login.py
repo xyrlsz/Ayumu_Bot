@@ -34,4 +34,6 @@ def login_QQ(get_config):
 
     bqimage.save("QR.png")
     qr_code = Image.open("QR.png")
-    print_QR(qr_code)
+    # 旧的打印函数不要了
+    # print_QR(qr_code)
+    print_QR(response_json["ResponseData"]["QrUrl"])

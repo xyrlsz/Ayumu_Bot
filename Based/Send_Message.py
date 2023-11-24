@@ -32,4 +32,3 @@ def send_message(message):
     response = requests.request("POST", url, headers=headers, data=payload)
 
     print(response.text)
-    print(message.get_body())
