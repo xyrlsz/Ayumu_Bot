@@ -1,3 +1,4 @@
+import time
 import requests
 import base64
 from PIL import Image
@@ -16,8 +17,18 @@ def login_QQ(get_config):
     )
     payload = {}
     headers = {"User-Agent": "Apifox/1.0.0 (https://apifox.com)"}
-
-    response = requests.get(login_url, headers=headers, data=payload)
+    while True:
+        try:
+            # 尝试执行的代码
+            response = requests.get(login_url, headers=headers, data=payload)
+            pass
+        except Exception as e:
+            print(f"发生错误: {e}")
+            print("10秒后重试...")
+            time.sleep(10)
+        else:
+            # 如果没有错误，跳出循环
+            break
 
     """print(response.text)
     """

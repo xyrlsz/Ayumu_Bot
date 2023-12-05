@@ -11,6 +11,7 @@ Base64Buf Base64Buf编码
 
 path 是文件路径或者文件网络路径或者Base64Buf编码
 """
+import time
 import requests
 import json
 from Based.Config import get_config
@@ -83,7 +84,19 @@ class UpFile:
             "Content-Type": "application/json",
         }
 
-        response = requests.post(url, headers=headers, data=payload)
+        while True:
+            try:
+                # 尝试执行的代码
+                response = requests.post(url, headers=headers, data=payload)
+                pass
+            except Exception as e:
+                print(f"发生错误: {e}")
+                print("10秒后重试...")
+                time.sleep(10)
+            else:
+                # 如果没有错误，跳出循环
+                break
+
         # if response.json()["CgiBaseResponse"]["Ret"] == 0 and self.is_Uplaoded == False:
         #     print("上传成功")
         # else:

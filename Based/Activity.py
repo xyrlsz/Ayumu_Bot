@@ -1,3 +1,4 @@
+import time
 from Based.Event import Event
 import requests
 import json
@@ -28,8 +29,19 @@ async def Remove_Msg(message_Event: Event):
         "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
         "Content-Type": "application/json",
     }
+    while True:
+        try:
+            # 尝试执行的代码
+            response = requests.request("POST", url, headers=headers, data=payload)
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+            pass
+        except Exception as e:
+            print(f"发生错误: {e}")
+            print("10秒后重试...")
+            time.sleep(10)
+        else:
+            # 如果没有错误，跳出循环
+            break
 
     print(response.text)
 
@@ -57,8 +69,19 @@ async def Ban_Member(GroupUin: int, SenderUid: str, BanTime: int = 60):
         "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
         "Content-Type": "application/json",
     }
+    while True:
+        try:
+            # 尝试执行的代码
+            response = requests.request("POST", url, headers=headers, data=payload)
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+            pass
+        except Exception as e:
+            print(f"发生错误: {e}")
+            print("10秒后重试...")
+            time.sleep(10)
+        else:
+            # 如果没有错误，跳出循环
+            break
 
     print(response.text)
 
@@ -85,8 +108,19 @@ async def Remove_Member(GroupUin: int, SenderUid: str):
         "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
         "Content-Type": "application/json",
     }
+    while True:
+        try:
+            # 尝试执行的代码
+            response = requests.request("POST", url, headers=headers, data=payload)
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+            pass
+        except Exception as e:
+            print(f"发生错误: {e}")
+            print("10秒后重试...")
+            time.sleep(10)
+        else:
+            # 如果没有错误，跳出循环
+            break
 
     print(response.text)
 
@@ -106,7 +140,18 @@ async def Exit_Group(GroupUin: int):
         "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
         "Content-Type": "application/json",
     }
+    while True:
+        try:
+            # 尝试执行的代码
+            response = requests.request("POST", url, headers=headers, data=payload)
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+            pass
+        except Exception as e:
+            print(f"发生错误: {e}")
+            print("10秒后重试...")
+            time.sleep(10)
+        else:
+            # 如果没有错误，跳出循环
+            break
 
     print(response.text)

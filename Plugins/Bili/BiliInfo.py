@@ -312,7 +312,20 @@ def get_short_url_idAndPnum(url: str):
     # 示例使用 Chrome 91 版本的 User-Agent，你可以根据需要更新其中的版本号和其他信息。
     if url is None:
         return None
-    response = requests.request("POST", url, headers=headers2)
+    while True:
+        try:
+            # 尝试执行的代码
+            response = requests.request("POST", url, headers=headers2)
+
+            pass
+        except Exception as e:
+            print(f"发生错误: {e}")
+            print("10秒后重试...")
+            time.sleep(10)
+        else:
+            # 如果没有错误，跳出循环
+            break
+
     # print(response.text)
     return [get_Id(str(response.text)), get_Pnum(str(response.text))]
 
