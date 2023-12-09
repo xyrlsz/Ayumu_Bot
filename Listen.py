@@ -16,33 +16,37 @@ import requests
 import websockets
 
 from Based.Event import Event
-from Based.Send_Message import send_message
-from Plugins.Ncm_music.ncmcard import NcmCard
-from Plugins.Ncm_music.ncm_info import search_music_result
-from Plugins.Ncm_music.ncm_info import get_song_info
-from Based.Message import CardMessage
-from Based.Message import TextMessage
+
+# from Based.Send_Message import send_message
+# from Plugins.Ncm_music.ncmcard import NcmCard
+# from Plugins.Ncm_music.ncm_info import search_music_result
+# from Plugins.Ncm_music.ncm_info import get_song_info
+# from Based.Message import CardMessage
+# from Based.Message import TextMessage
 from Plugins.Ncm_music.ncm import send_song
 from Plugins.Anime.Anime import send_animetext
 
 import requests
 import base64
 from PIL import Image
-from io import BytesIO
+
+# from io import BytesIO
 import requests
 import json
 from Based.Stauts import get_Status
 from Based.Login import login_QQ
 from Based.Config import get_config
-from Based.Message import TextMessage
-from Based.Message import ImageMessage
-from Based.Message import VoiceMessage
-from Based.Message import NormalMessage
-from Based.Message import TextWithImageMessage
-from Based.Message import CardMessage
-from Based.Send_Message import send_message
-from Based.ToUpload_File import UpFile
+
+# from Based.Message import TextMessage
+# from Based.Message import ImageMessage
+# from Based.Message import VoiceMessage
+# from Based.Message import NormalMessage
+# from Based.Message import TextWithImageMessage
+# from Based.Message import CardMessage
+# from Based.Send_Message import send_message
+# from Based.ToUpload_File import UpFile
 from Plugins.Bili.BiliInfo import analysis_Bili
+from Plugins import NoRepeating
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -75,7 +79,7 @@ async def Wsdemo():
                 Message = Event(EventJson)
                 # 把Message对象放入队列
                 if int(Message.getEventData().FromUin()) not in receive_forbidden_list:
-                    if str(Message.getEventData().SenderUin()) != str(QQBotUid): 
+                    if str(Message.getEventData().SenderUin()) != str(QQBotUid):
                         await queue.put(Message)
                 else:
                     print("已过滤" + str(Message.getEventData().FromUin()) + "消息")
@@ -114,7 +118,7 @@ def Todo(message: Event):
 async def process_message():
     # 从队列里取出Message对象并处理
     while True:
-        message = await queue.get()
+        message: Event = await queue.get()
         # do something with message
         # print(message.getEventData().Content())
         # Todo(message)
@@ -122,6 +126,7 @@ async def process_message():
 
         if await analysis_Bili(message) is not True or None:
             await send_animetext(message)
+        await NoRepeating.RemoveMsg(message)
         queue.task_done()
 
 
