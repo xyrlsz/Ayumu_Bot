@@ -1,0 +1,1 @@
+cd /root/Ayumu_Bot  && screen -S opq -d -m /root/.cache/pypoetry/virtualenvs/mybot-qOtdf8S1-py3.11/bin/python start_linux.py && screen -S bot -d -m /root/.cache/pypoetry/virtualenvs/mybot-qOtdf8S1-py3.11/bin/python Listen.py
