@@ -47,3 +47,7 @@ async def RemoveMsg(Message_Event: Event):
             MsgDataDict[GroupUin]["Content"] = now_msg
             MsgDataDict[GroupUin]["Counts"] = 1
             is_Interrupt = False
+    else:
+        MsgDataDict[GroupUin]["Counts"] = 0
+        MsgDataDict[GroupUin]["Content"] = ""
+        is_Interrupt = False
