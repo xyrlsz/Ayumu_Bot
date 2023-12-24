@@ -430,7 +430,7 @@ async def analysis_Bili(message: Event):
     # 获取当前时间戳
     current_time = time.time()
     if current_time - last_call_time < 10:
-        return True
+        return False
     Content = message.getEventData().Content()
     if is_json(str(Content)):
         parsed_data = json.loads(Content)
