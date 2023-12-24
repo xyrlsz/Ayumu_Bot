@@ -50,6 +50,7 @@ async def send_song(message: Event):
                                 AtUinLists=new_dict_array,
                             ),
                         )
+
                 except:
                     send_message(
                         TextMessage(
@@ -58,3 +59,5 @@ async def send_song(message: Event):
                             "获取链接失败",
                         ),
                     )
+                return True
+    return False
