@@ -22,9 +22,9 @@ def print_QR(login_url: str):
     qr.add_data(login_url)
     qr.make(fit=True)
 
-    # 获取二维码对象
-    qr_code = qr.make_image(fill_color="black", back_color="white")
-    # 打印二维码
+    # # 获取二维码对象
+    # qr_code = qr.make_image(fill_color="black", back_color="white")
+    # # 打印二维码
     qr.print_ascii(invert=True)
     # 显示二维码图片
     # qr_code.show()

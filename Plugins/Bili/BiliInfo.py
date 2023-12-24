@@ -1,4 +1,5 @@
 # from bilireq import video
+import os
 from bilibili_api import video
 import json
 import requests
@@ -21,6 +22,9 @@ from Based.Message import TextMessage
 from Based.Config import get_config
 import asyncio
 from Based.ToUpload_File import UpFile
+from io import BytesIO
+from PIL import Image
+
 
 config = "Config/config.yaml"
 config_data = get_config(config)  # Renamed the variable to avoid conflict
@@ -28,6 +32,24 @@ Host = config_data["Host"]
 QQBotUid = config_data["QQBotUid"]
 devicename = config_data["devicename"]
 Myjson = config_data["json"]
+
+
+async def save_image_from_url(url, save_path):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+
+        # 确保保存图片的目录存在
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+        image = Image.open(BytesIO(response.content))
+
+        # 保存图片到指定位置
+        image.save(save_path)
+        print(f"图片已保存到 {save_path}")
+    except Exception as e:
+        print(f"图片保存失败: {str(e)}")
+        await save_image_from_url(url, save_path)
 
 
 def get_Pnum(url):
@@ -452,7 +474,9 @@ async def analysis_Bili(message: Event):
                 Type = message.getEventData().FromType()
                 logging.info(f"Card: {card}")
                 logging.info(f"Pic URL: {pic_url}")
-                pic = UpFile(Type, "FileUrl", pic_url)
+                await save_image_from_url(pic_url, "./pic/tmp.jpg")
+                # pic = UpFile(Type, "FileUrl", pic_url)
+                pic = UpFile(Type, "FilePath", "./pic/tmp.jpg")
                 send_message(
                     TextWithImageMessage(
                         receiver,
@@ -480,7 +504,9 @@ async def analysis_Bili(message: Event):
                 Type = message.getEventData().FromType()
                 logging.info(f"Card: {card}")
                 logging.info(f"Pic URL: {pic_url}")
-                pic = UpFile(Type, "FileUrl", pic_url)
+                await save_image_from_url(pic_url, "./pic/tmp.jpg")
+                # pic = UpFile(Type, "FileUrl", pic_url)
+                pic = UpFile(Type, "FilePath", "./pic/tmp.jpg")
                 send_message(
                     TextWithImageMessage(
                         receiver,
