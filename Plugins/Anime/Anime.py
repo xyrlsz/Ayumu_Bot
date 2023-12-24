@@ -164,3 +164,6 @@ async def send_animetext(message: Event):
                                     AtUinLists=new_dict_array,
                                 )
                             )
+
+                    return True
+    return False
