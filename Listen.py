@@ -78,6 +78,13 @@ def Todo(message: Event):
         print(message.getEventData().MsgBody())
 
 
+async def isCanSendAnimeText(message: Event):
+    if await analysis_Bili(message) or send_song(message):
+        None
+    else:
+        await send_animetext(message)
+
+
 async def process_message():
     # 从队列里取出Message对象并处理
     while True:
@@ -85,11 +92,18 @@ async def process_message():
         # do something with message
         # print(message.getEventData().Content())
         # Todo(message)
-        await send_song(message)
 
-        if await analysis_Bili(message) is not True or None:
+        results = await asyncio.gather(
+            NoRepeating.RemoveMsg(message),
+            analysis_Bili(message),
+            send_song(message),
+        )
+
+        if any(result is True for result in results):
+            None
+        else:
             await send_animetext(message)
-        await NoRepeating.RemoveMsg(message)
+
         queue.task_done()
 
 
