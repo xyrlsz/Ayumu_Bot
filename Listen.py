@@ -101,17 +101,15 @@ async def process_message():
            # send_song(message),
            # SeTu(message),
         # )
-        task1 = asyncio.create_task(NoRepeating.RemoveMsg(message))
-        task2 = asyncio.create_task(analysis_Bili(message))
-        task3 = asyncio.create_task(send_song(message))
-        task4 = asyncio.create_task(SeTu(message))
-
-        results = [
-          await task1,
-          await task2,
-          await task3,
-          await task4
+        sem = asyncio.Semaphore(2)  # 限制同时运行的任务数量为2
+        tasks = [
+        limited_task(sem, NoRepeating.RemoveMsg, message),
+        limited_task(sem, analysis_Bili, message),
+        limited_task(sem, send_song, message),
+        limited_task(sem, SeTu, message)
         ]
+        results = await asyncio.gather(*tasks)
+        print(results)
         
 
         if any(result is True for result in results):
