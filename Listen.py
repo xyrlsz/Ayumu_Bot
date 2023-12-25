@@ -100,18 +100,18 @@ async def process_message():
            # analysis_Bili(message),
            # send_song(message),
            # SeTu(message),
-       # )
-       task1 = asyncio.create_task(NoRepeating.RemoveMsg(message))
-       task2 = asyncio.create_task(analysis_Bili(message))
-       task3 = asyncio.create_task(send_song(message))
-       task4 = asyncio.create_task(SeTu(message))
+        # )
+        task1 = asyncio.create_task(NoRepeating.RemoveMsg(message))
+        task2 = asyncio.create_task(analysis_Bili(message))
+        task3 = asyncio.create_task(send_song(message))
+        task4 = asyncio.create_task(SeTu(message))
 
-       results = [
+        results = [
           await task1,
           await task2,
           await task3,
           await task4
-       ]
+        ]
         
 
         if any(result is True for result in results):
