@@ -186,6 +186,7 @@ async def SeTu(message: Event):
                     pid = int(content[pid_search_start_index:])
                     pic_url = pixiv.get_illust_url(pid)
                     title = pixiv.get_illust_detail(pid).illust.title
+                    title = title.replace("/", "·")
                     tags_jsons = pixiv.get_illust_detail(pid).illust.tags
                     author_name = pixiv.get_illust_detail(pid).illust.user.name
                     tags = ""
