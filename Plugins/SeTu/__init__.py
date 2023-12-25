@@ -169,8 +169,8 @@ async def SeTu(message: Event):
             one_pic_cmd = ["来张色图", "来张涩图"]
 
             if pid_search_start_index != -1:
-                pid_search_start_index += len("pid搜索")
-                pid = int(content[pid_search_start_index:])
+                # pid_search_start_index += len("pid搜索")
+                # pid = int(content[pid_search_start_index:])
                 # print(pixiv.get_illust_url(pid))
                 # print(pixiv.get_illust_detail(pid).illust.title)
                 # print(pixiv.get_illust_detail(pid).illust.tags)
@@ -182,6 +182,8 @@ async def SeTu(message: Event):
                 #     pixiv.get_illust_url(pid),
                 # )
                 try:
+                    pid_search_start_index += len("pid搜索")
+                    pid = int(content[pid_search_start_index:])
                     pic_url = pixiv.get_illust_url(pid)
                     title = pixiv.get_illust_detail(pid).illust.title
                     tags_jsons = pixiv.get_illust_detail(pid).illust.tags
