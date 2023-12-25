@@ -220,8 +220,9 @@ async def SeTu(message: Event):
                         InfoText,
                         pixiv_pic.get_file_md5(),
                         pixiv_pic.get_file_id(),
-                        pixiv_pic.get_height(),
                         pixiv_pic.get_width(),
+                        pixiv_pic.get_height(),
+                        
                         pixiv_pic.get_file_size(),
                     )
                 )
