@@ -158,9 +158,9 @@ def contains_command(user_input: str, command_list: list):
             return True
     return False
 
-
+pixiv = Pixiv(_REFRESH_TOKEN)
 async def SeTu(message: Event):
-    pixiv = Pixiv(_REFRESH_TOKEN)
+    global pixiv
     if message.getEventData().MsgBody():
         content = message.getEventData().Content()
         if content:
