@@ -28,6 +28,8 @@ from Based.Config import get_config
 
 from Plugins.Bili.BiliInfo import analysis_Bili
 from Plugins import NoRepeating
+from Plugins.SeTu import SeTu
+
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -97,6 +99,7 @@ async def process_message():
             NoRepeating.RemoveMsg(message),
             analysis_Bili(message),
             send_song(message),
+            SeTu(message),
         )
 
         if any(result is True for result in results):

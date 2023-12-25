@@ -177,3 +177,7 @@ CoreConf.conf
 OPQBot.exe
 pic/
 poetry.lock
+
+Pixiv/
+body.txt
+cookies.txt

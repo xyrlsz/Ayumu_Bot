@@ -28,7 +28,38 @@ devicename = config_data["devicename"]
 Myjson = config_data["json"]
 
 
+def get_image_size(path: str):
+    if path.startswith("http"):
+        # 如果是图片链接
+        response = requests.get(path)
+        img = Image.open(BytesIO(response.content))
+    elif path.startswith("data:image"):
+        # 如果是 base64 编码的图片数据
+        encoded_data = path.split(",")[1]
+        decoded_data = base64.b64decode(encoded_data)
+        img = Image.open(BytesIO(decoded_data))
+    else:
+        # 如果是文件路径
+        img = Image.open(path)
+
+    width, height = img.size
+    return width, height
+
+
 class UpFile:
+    """
+    command_id 1好友图片 2群组图片 26好友语音 29群组语音
+
+    way 有一下三种：
+
+    FilePath  文件本地路径FilePath, FileUrl、Base64Buf不能同时存在
+
+    FileUrl 文件网络路径
+
+    Base64Buf Base64Buf编码
+
+    path 是文件路径或者文件网络路径或者Base64Buf编码"""
+
     def __init__(self, command_id: int, way: str, path: str):
         self.__command_id = command_id
         # self.__is_Uplaoded = False
@@ -41,8 +72,8 @@ class UpFile:
                     "FilePath": path,
                 },
             }
-            if self.__command_id == 1 or self.__command_id == 2:
-                self.__height, self.__width = Image.open(path).size
+            # if self.__command_id == 1 or self.__command_id == 2:
+            #     self.__height, self.__width = Image.open(path).size
         elif way == "FileUrl":
             self.__body = {
                 "CgiCmd": "PicUp.DataUp",
@@ -51,13 +82,13 @@ class UpFile:
                     "FileUrl": path,
                 },
             }
-            if self.__command_id == 1 or self.__command_id == 2:
-                response = requests.get(path)
+            # if self.__command_id == 1 or self.__command_id == 2:
+            #     response = requests.get(path)
 
-                if response.status_code == 200:
-                    image_data = BytesIO(response.content)
-                    img = Image.open(image_data)
-                self.__height, self.__width = img.size
+            #     if response.status_code == 200:
+            #         image_data = BytesIO(response.content)
+            #         img = Image.open(image_data)
+            #     self.__height, self.__width = img.size
         elif way == "FileBase64":
             self.__body = {
                 "CgiCmd": "PicUp.DataUp",
@@ -66,9 +97,10 @@ class UpFile:
                     "Base64Buf": path,
                 },
             }
-            bqbinary = base64.b64decode(path)
-            bqimage = Image.open(BytesIO(bqbinary))
-            self.__height, self.__width = bqimage.size
+            # bqbinary = base64.b64decode(path)
+            # bqimage = Image.open(BytesIO(bqbinary))
+            # self.__height, self.__width = bqimage.size
+        self.__height, self.__width = get_image_size(path)
         self.__info = self.get_info()
 
     def get_body(self) -> dict:
