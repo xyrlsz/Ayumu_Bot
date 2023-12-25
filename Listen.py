@@ -95,18 +95,25 @@ async def process_message():
         # print(message.getEventData().Content())
         # Todo(message)
 
-        results = await asyncio.gather(
-            NoRepeating.RemoveMsg(message),
-            analysis_Bili(message),
-            send_song(message),
-            SeTu(message),
-        )
+        #results = await asyncio.gather(
+           # NoRepeating.RemoveMsg(message),
+           # analysis_Bili(message),
+         #   send_song(message),
+         #   SeTu(message),
+       # )
 
-        if any(result is True for result in results):
+        
+
+        #if any(result is True for result in results):
+         #   None
+        #else:
+            #await send_animetext(message)
+ 
+        if (NoRepeating.RemoveMsg(message) or analysis_Bili(message) or send_song(message) or  SeTu(message)):
             None
         else:
             await send_animetext(message)
-
+        
         queue.task_done()
 
 
