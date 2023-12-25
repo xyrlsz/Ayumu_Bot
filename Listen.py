@@ -86,7 +86,10 @@ async def isCanSendAnimeText(message: Event):
     else:
         await send_animetext(message)
 
-
+async def limited_task(sem, coro, message):
+    async with sem:
+        return await coro(message)
+        
 async def process_message():
     # 从队列里取出Message对象并处理
     while True:
