@@ -13,6 +13,7 @@ import asyncio
 from Based.ToUpload_File import UpFile
 import os
 import sys
+import re
 from datetime import datetime
 from pixivpy3 import AppPixivAPI, ByPassSniApi
 
@@ -165,7 +166,12 @@ async def SeTu(message: Event):
         content = message.getEventData().Content()
         if content:
             content.split()
-            pid_search_start_index = content.find("pid搜索")
+            match = re.search(r'pid搜索|pid:|pid', content)
+            if match:
+                matched_string = match.group()
+                pid_search_start_index = match.start() + len(matched_string)
+
+            # pid_search_start_index = content.find("pid搜索")
             one_pic_cmd = ["来张色图", "来张涩图"]
 
             if pid_search_start_index != -1:
