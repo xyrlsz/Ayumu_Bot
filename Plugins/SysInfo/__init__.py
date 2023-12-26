@@ -87,7 +87,7 @@ async def periodic_send_info():
                     """
             info = info.strip()
 
-            send_message(TextMessage(2434221948, 1, info))
+            send_message(TextMessage(721213151, 2, info))
             last_send_sys_info_time = now_time
 
     except Exception as e:
