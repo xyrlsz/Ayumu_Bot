@@ -43,6 +43,7 @@ class Pixiv:
         else:
             self.api = ByPassSniApi()  # Same as AppPixivAPI, but bypass the GFW
             self.api.require_appapi_hosts()
+
         self.api.auth(refresh_token=refresh_token)
 
     def download(self, url: str, directory: str = "Pixiv/", filename: str = "tmp.jpg"):
@@ -159,14 +160,16 @@ def contains_command(user_input: str, command_list: list):
             return True
     return False
 
+
 pixiv = Pixiv(_REFRESH_TOKEN)
+
+
 async def SeTu(message: Event):
     global pixiv
     if message.getEventData().MsgBody():
         content = message.getEventData().Content()
         if content:
-            content.split()
-            
+            content = content.strip()
             pid_search_start_index = content.find("pid搜索")
             one_pic_cmd = ["来张色图", "来张涩图"]
 
@@ -215,6 +218,7 @@ async def SeTu(message: Event):
                 pixiv_pic = UpFile(
                     message.getEventData().FromType(), "FilePath", pic_path
                 )
+
                 send_message(
                     TextWithImageMessage(
                         message.getEventData().FromUin(),
@@ -222,12 +226,12 @@ async def SeTu(message: Event):
                         InfoText,
                         pixiv_pic.get_file_md5(),
                         pixiv_pic.get_file_id(),
-                        pixiv_pic.get_width(),
                         pixiv_pic.get_height(),
-                        
+                        pixiv_pic.get_width(),
                         pixiv_pic.get_file_size(),
                     )
                 )
+                del pixiv_pic
                 return True
 
     return False

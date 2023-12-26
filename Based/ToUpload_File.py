@@ -28,7 +28,7 @@ devicename = config_data["devicename"]
 Myjson = config_data["json"]
 
 
-def get_image_size(path: str):
+def get_image_size(path: str) -> [int, int]:
     if path.startswith("http"):
         # 如果是图片链接
         response = requests.get(path)
@@ -100,7 +100,7 @@ class UpFile:
             # bqbinary = base64.b64decode(path)
             # bqimage = Image.open(BytesIO(bqbinary))
             # self.__height, self.__width = bqimage.size
-        self.__height, self.__width = get_image_size(path)
+        self.__width, self.__height = get_image_size(path)
         self.__info = self.get_info()
 
     def get_body(self) -> dict:

@@ -4,6 +4,7 @@ import json
 
 from Based.Config import get_config
 from Based.ToUpload_File import UpFile
+from Based.Message import TextMessage
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -15,7 +16,7 @@ Myjson = get_config["json"]
 send_forbidden = get_config["send_forbidden"]
 
 
-def send_message(message):
+def send_message(message: TextMessage):
     if message.get_body()["CgiRequest"]["ToUin"] in send_forbidden:
         print("已禁止发送消息给" + str(message.get_body()["CgiRequest"]["ToUin"]))
         return
@@ -33,6 +34,7 @@ def send_message(message):
         try:
             # 尝试执行的代码
             response = requests.request("POST", url, headers=headers, data=payload)
+            print(str(message.get_body()) + "\n")
             pass
         except Exception as e:
             print(f"发生错误: {e}")
