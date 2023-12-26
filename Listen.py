@@ -103,6 +103,7 @@ async def limited_task(sem, coro, message=None):
 async def process_message():
     global sem
     while True:
+        periodic_send_info()
         # 从队列里取出Message对象并处理
         message: Event = await queue.get()
 
@@ -143,7 +144,6 @@ loop = asyncio.get_event_loop()
 tasks = asyncio.gather(
     Wsdemo(),
     process_message(),
-    limited_task(sem, periodic_send_info()),
 )
 
 # 运行
