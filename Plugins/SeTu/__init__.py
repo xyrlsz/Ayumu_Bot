@@ -170,7 +170,20 @@ async def SeTu(message: Event):
         content = message.getEventData().Content()
         if content:
             content = content.strip()
-            pid_search_start_index = content.find("pid搜索")
+            pid_cmd = [
+                "pid:",
+                "pid搜索",
+                "pid",
+                "https://www.pixiv.net/artworks/",
+            ]
+
+            pid_search_start_index = -1
+
+            for cmd in pid_cmd:
+                if cmd in content:
+                    pid_search_start_index = content.find(cmd)
+                    pid_search_start_index += len(cmd)
+                    break
             one_pic_cmd = ["来张色图", "来张涩图"]
 
             if pid_search_start_index != -1:
@@ -187,7 +200,6 @@ async def SeTu(message: Event):
                 #     pixiv.get_illust_url(pid),
                 # )
                 try:
-                    pid_search_start_index += len("pid搜索")
                     pid = int(content[pid_search_start_index:])
                     pic_url = pixiv.get_illust_url(pid)
                     title = pixiv.get_illust_detail(pid).illust.title
