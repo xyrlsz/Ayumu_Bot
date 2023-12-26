@@ -103,7 +103,7 @@ async def limited_task(sem, coro, message=None):
 async def process_message():
     global sem
     while True:
-        periodic_send_info()
+        # periodic_send_info()
         # 从队列里取出Message对象并处理
         message: Event = await queue.get()
 
