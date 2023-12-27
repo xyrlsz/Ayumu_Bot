@@ -17,12 +17,13 @@ async def getSysInfo(messge: Event):
             content.find("系统信息") != -1
             and str(messge.getEventData().SenderUin()) == "2434221948"
         ):
-            # 获取平台信息
-            platform_info = platform.system()
+            # 获取系统
+            # platform_info = platform.system()
+            platform_info = platform.platform()
 
             # 获取CPU架构信息
-            cpu_architecture = platform.architecture()[0]
-
+            # cpu_architecture = platform.architecture()[0]
+            cpu_architecture = platform.machine()
             # 获取内存信息
             memory_info = psutil.virtual_memory()
             total_memory = memory_info.total
@@ -69,11 +70,13 @@ def send_info(cold_time: int):
         time.sleep(1)
         if current_time - last_send_sys_info_time < cold_time:
             continue
-        platform_info = platform.system()
+        ## 获取系统
+        # platform_info = platform.system()
+        platform_info = platform.platform()
 
         # 获取CPU架构信息
-        cpu_architecture = platform.architecture()[0]
-
+        # cpu_architecture = platform.architecture()[0]
+        cpu_architecture = platform.machine()
         # 获取内存信息
         memory_info = psutil.virtual_memory()
         total_memory = memory_info.total
