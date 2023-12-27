@@ -39,19 +39,24 @@ async def save_image_from_url(url, save_path):
         response = requests.get(url)
         response.raise_for_status()
 
-        # 确保保存图片的目录存在
+        # Ensure the directory for saving the image exists
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
         image = Image.open(BytesIO(response.content))
 
-        # 保存图片到指定位置
+        # Convert image to RGB mode if it's in RGBA mode
+        if image.mode == 'RGBA':
+            image = image.convert('RGB')
+
+        # Save the image to the specified location
         image.save(save_path)
-        print(f"图片已保存到 {save_path}")
+        print(f"Image saved to {save_path}")
         return True
     except Exception as e:
-        print(f"图片保存失败: {str(e)}")
+        print(f"Image save failed: {str(e)}")
         # await save_image_from_url(url, save_path)
     return False
+
 
 
 def get_Pnum(url):
