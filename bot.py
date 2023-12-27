@@ -33,7 +33,19 @@ new_dict_array = [
     {"Nick": "XYR⊙LSZ ", "Uin": 2434221948},
 ]
 
-# message = TextMessage(797649367, 2, "shabi", new_dict_array)
+voice = UpFile(26, "FilePath", "data/audio/niganma.amr")
+
+send_message(
+    VoiceMessage(
+        2434221948,
+        1,
+        voice.get_file_md5(),
+        voice.get_file_size(),
+        voice.get_file_token(),
+    )
+)
+# send_message(TextMessage(797649367, 2, "shabi", new_dict_array))
+# # message = TextMessage(797649367, 2, "shabi", new_dict_array)
 
 # message = TextMessage(797649367, 2, "shabi")
 # message = TextWithImageMessage(
