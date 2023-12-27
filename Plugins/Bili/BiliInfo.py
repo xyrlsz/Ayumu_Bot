@@ -47,9 +47,11 @@ async def save_image_from_url(url, save_path):
         # 保存图片到指定位置
         image.save(save_path)
         print(f"图片已保存到 {save_path}")
+        return True
     except Exception as e:
         print(f"图片保存失败: {str(e)}")
-        await save_image_from_url(url, save_path)
+        # await save_image_from_url(url, save_path)
+    return False
 
 
 def get_Pnum(url):
@@ -474,9 +476,10 @@ async def analysis_Bili(message: Event):
                 Type = message.getEventData().FromType()
                 logging.info(f"Card: {card}")
                 logging.info(f"Pic URL: {pic_url}")
-                await save_image_from_url(pic_url, "./pic/tmp.jpg")
-                # pic = UpFile(Type, "FileUrl", pic_url)
-                pic = UpFile(Type, "FilePath", "./pic/tmp.jpg")
+                if await save_image_from_url(pic_url, "./pic/tmp.jpg"):
+                    pic = UpFile(Type, "FilePath", "./pic/tmp.jpg")
+                else:
+                    pic = UpFile(Type, "FileUrl", pic_url)
                 send_message(
                     TextWithImageMessage(
                         receiver,
@@ -504,9 +507,10 @@ async def analysis_Bili(message: Event):
                 Type = message.getEventData().FromType()
                 logging.info(f"Card: {card}")
                 logging.info(f"Pic URL: {pic_url}")
-                await save_image_from_url(pic_url, "./pic/tmp.jpg")
-                # pic = UpFile(Type, "FileUrl", pic_url)
-                pic = UpFile(Type, "FilePath", "./pic/tmp.jpg")
+                if await save_image_from_url(pic_url, "./pic/tmp.jpg"):
+                    pic = UpFile(Type, "FilePath", "./pic/tmp.jpg")
+                else:
+                    pic = UpFile(Type, "FileUrl", pic_url)
                 send_message(
                     TextWithImageMessage(
                         receiver,
