@@ -11,7 +11,7 @@ Myjson = config_data["json"]
 import asyncio
 import json
 import random
-
+import threading
 import websockets
 
 from Based.Event import Event
@@ -29,7 +29,7 @@ from Based.Config import get_config
 from Plugins.Bili.BiliInfo import analysis_Bili
 from Plugins import NoRepeating
 from Plugins.SeTu import SeTu
-from Plugins.SysInfo import getSysInfo, periodic_send_info
+from Plugins.SysInfo import getSysInfo, send_info
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -137,14 +137,26 @@ async def process_message():
         queue.task_done()
 
 
-# 创建一个事件循环
-loop = asyncio.get_event_loop()
+def run_asyncio_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(asyncio.gather(Wsdemo(), process_message()))
 
-# 把两个异步函数添加到事件循环
-tasks = asyncio.gather(
-    Wsdemo(),
-    process_message(),
-)
 
-# 运行
-loop.run_until_complete(tasks)
+def run_threaded_tasks():
+    loop = asyncio.new_event_loop()
+
+    # 创建线程
+    thread1 = threading.Thread(target=send_info, args=(60 * 30,))
+    thread2 = threading.Thread(target=run_asyncio_loop, args=(loop,))
+
+    # 开始线程
+    thread1.start()
+    thread2.start()
+
+    # 等待线程结束
+    thread1.join()
+    thread2.join()
+
+
+if __name__ == "__main__":
+    run_threaded_tasks()
