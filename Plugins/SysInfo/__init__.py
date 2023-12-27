@@ -62,18 +62,13 @@ async def getSysInfo(messge: Event):
 last_send_sys_info_time = 0
 
 
-def is_whole_hour_or_half():
-    current_time = datetime.datetime.now().time()
-    return current_time.minute == 0 or current_time.minute == 30
-
-
-def your_task():
-    # 这里执行你的任务逻辑
-    print("任务执行中...")
-
-
-def send_info():
-    try:
+def send_info(cold_time: int):
+    global last_send_sys_info_time
+    while True:
+        current_time = time.time()
+        time.sleep(1)
+        if current_time - last_send_sys_info_time < cold_time:
+            continue
         platform_info = platform.system()
 
         # 获取CPU架构信息
@@ -91,18 +86,11 @@ def send_info():
         process_memory = process_memory_info.rss  # Resident Set Size (进程占用的物理内存)
 
         info = f"""
-                    系统平台：{platform_info}\nCPU信息：{cpu_architecture}\n总内存：{total_memory / (1024 ** 2):.2f} MB\n已使用：{used_memory / (1024 ** 2):.2f} MB\n已使用百分比：{memory_percent}%\n当前进程占用：{process_memory / (1024 ** 2):.2f} MB\n
-                    """
+                        系统平台：{platform_info}\nCPU信息：{cpu_architecture}\n总内存：{total_memory / (1024 ** 2):.2f} MB\n已使用：{used_memory / (1024 ** 2):.2f} MB\n已使用百分比：{memory_percent}%\n当前进程占用：{process_memory / (1024 ** 2):.2f} MB\n
+                        """
         info = info.strip()
 
         send_message(TextMessage(721213151, 2, info))
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-def periodic_send_info():
-    while True:
-        if is_whole_hour_or_half():
-            send_info()
-        time.sleep(60)
+        del info
+        last_send_sys_info_time = current_time
+        del current_time
