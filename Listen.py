@@ -15,21 +15,18 @@ import threading
 import websockets
 
 from Based.Event import Event
-
-from Plugins.Ncm_music.ncm import send_song
-from Plugins.Anime.Anime import send_animetext
-
-
-import json
 from Based.Stauts import get_Status
 from Based.Login import login_QQ
 from Based.Config import get_config
 
 
+from Plugins.Ncm_music.ncm import send_song
+from Plugins.Anime.Anime import send_animetext
 from Plugins.Bili.BiliInfo import analysis_Bili
 from Plugins import NoRepeating
 from Plugins.SeTu import SeTu
 from Plugins.SysInfo import getSysInfo, send_info
+from Plugins.NiGanMa import NiGanMa
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -124,6 +121,7 @@ async def process_message():
             limited_task(sem, send_song, message),
             limited_task(sem, SeTu, message),
             limited_task(sem, getSysInfo, message),
+            limited_task(sem, NiGanMa, message),
         ]
         results = await asyncio.gather(*tasks)
         # print(results)

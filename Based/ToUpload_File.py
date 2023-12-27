@@ -19,6 +19,11 @@ from PIL import Image
 import requests
 from io import BytesIO
 import base64
+from PIL import UnidentifiedImageError
+
+import requests
+import io
+
 
 config = "Config/config.yaml"
 config_data = get_config(config)  # Renamed the variable to avoid conflict
@@ -26,6 +31,54 @@ Host = config_data["Host"]
 QQBotUid = config_data["QQBotUid"]
 devicename = config_data["devicename"]
 Myjson = config_data["json"]
+
+
+def is_image_from_url(url: str):
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        with Image.open(io.BytesIO(response.content)) as img:
+            img.verify()
+            return True
+    except UnidentifiedImageError:
+        return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
+
+
+def is_image_from_base64(base64_data: str):
+    try:
+        img_data = base64.b64decode(base64_data)
+        with Image.open(io.BytesIO(img_data)) as img:
+            img.verify()
+            return True
+    except UnidentifiedImageError:
+        return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
+
+
+def is_image_from_filePath(file_path: str):
+    try:
+        with Image.open(file_path) as img:
+            img.verify()
+            return True
+    except UnidentifiedImageError:
+        return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
+
+
+def is_image(path: str) -> bool:
+    return (
+        is_image_from_url(path)
+        or is_image_from_base64(path)
+        or is_image_from_filePath(path)
+    )
 
 
 def get_image_size(path: str) -> [int, int]:
@@ -100,8 +153,10 @@ class UpFile:
             # bqbinary = base64.b64decode(path)
             # bqimage = Image.open(BytesIO(bqbinary))
             # self.__height, self.__width = bqimage.size
-        self.__width, self.__height = get_image_size(path)
+        if is_image(path):
+            self.__width, self.__height = get_image_size(path)
         self.__info = self.get_info()
+        print(self.__info)
 
     def get_body(self) -> dict:
         return self.__body
