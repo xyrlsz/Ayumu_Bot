@@ -100,21 +100,9 @@ async def limited_task(sem, coro, message=None):
 async def process_message():
     global sem
     while True:
-        # periodic_send_info()
         # 从队列里取出Message对象并处理
         message: Event = await queue.get()
 
-        # do something with message
-        # print(message.getEventData().Content())
-        # Todo(message)
-
-        # results = await asyncio.gather(
-        # NoRepeating.RemoveMsg(message),
-        # analysis_Bili(message),
-        # send_song(message),
-        # SeTu(message),
-        # )
-        # sem = asyncio.Semaphore(2)  # 限制同时运行的任务数量为2
         tasks = [
             limited_task(sem, NoRepeating.RemoveMsg, message),
             limited_task(sem, analysis_Bili, message),
