@@ -36,15 +36,30 @@ class Pixiv:
     def __init__(self, refresh_token: str):
         # self.api = AppPixivAPI()
         # self.api.auth(refresh_token=refresh_token)
-        sni = False
+        # sni = False
 
-        if not sni:
+        # if not sni:
+        #     self.api = AppPixivAPI()
+        # else:
+        #     self.api = ByPassSniApi()  # Same as AppPixivAPI, but bypass the GFW
+        #     self.api.require_appapi_hosts()
+
+        try:
             self.api = AppPixivAPI()
-        else:
-            self.api = ByPassSniApi()  # Same as AppPixivAPI, but bypass the GFW
-            self.api.require_appapi_hosts()
+        except Exception as e:
+            try:
+                self.api = ByPassSniApi()  # Same as AppPixivAPI, but bypass the GFW
+                self.api.require_appapi_hosts()
+            except Exception as e:
+                self.api = None
+                print(e)
+            print(e)
 
-        self.api.auth(refresh_token=refresh_token)
+        try:
+            self.api.auth(refresh_token=refresh_token)
+        except Exception as e:
+            print(e)
+            self.api = None
 
     def download(self, url: str, directory: str = "Pixiv/", filename: str = "tmp.jpg"):
         if not os.path.exists(directory):
