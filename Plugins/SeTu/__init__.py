@@ -176,7 +176,10 @@ def contains_command(user_input: str, command_list: list):
     return False
 
 
-pixiv = Pixiv(_REFRESH_TOKEN)
+while True:
+    pixiv = Pixiv(_REFRESH_TOKEN)
+    if pixiv.api is not None:
+        break
 
 
 async def SeTu(message: Event):
