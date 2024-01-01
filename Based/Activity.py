@@ -1,9 +1,10 @@
-import time
-from Based.Event import Event
-import requests
 import json
+import time
+
+import requests
+
 from Based.Config import get_config
-import asyncio
+from Based.Event import Event
 
 config = "Config/config.yaml"
 get_config = get_config(config)

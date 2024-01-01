@@ -11,19 +11,17 @@ Base64Buf Base64Buf编码
 
 path 是文件路径或者文件网络路径或者Base64Buf编码
 """
-import time
-import requests
-import json
-from Based.Config import get_config
-from PIL import Image
-import requests
-from io import BytesIO
 import base64
+import io
+import json
+import time
+from io import BytesIO
+
+import requests
+from PIL import Image
 from PIL import UnidentifiedImageError
 
-import requests
-import io
-
+from Based.Config import get_config
 
 config = "Config/config.yaml"
 config_data = get_config(config)  # Renamed the variable to avoid conflict

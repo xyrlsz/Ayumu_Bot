@@ -1,6 +1,6 @@
 import time
+
 import requests
-import json
 
 
 def post_request(url) -> dict:

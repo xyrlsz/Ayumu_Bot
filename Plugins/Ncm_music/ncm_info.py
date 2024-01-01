@@ -1,4 +1,3 @@
-from Plugins.Ncm_music.Config import get_config
 from Plugins.Ncm_music.post_request import post_request
 
 # api_url = get_config("config.yaml")["api_url"]

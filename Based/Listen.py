@@ -1,6 +1,9 @@
-import requests
+import asyncio
 import json
+import random
+import websockets
 
+from Based.Event import Event
 from Based.Config import get_config
 
 config = "../Config/config.yaml"
@@ -9,14 +12,6 @@ Host = config_data["Host"]
 QQBotUid = config_data["QQBotUid"]
 devicename = config_data["devicename"]
 Myjson = config_data["json"]
-
-import asyncio
-import json
-import random
-import requests
-import websockets
-
-from Based.Event import Event
 
 
 # websocket client

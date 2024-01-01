@@ -1,12 +1,14 @@
+from Based.Event import Event
+from Based.Activity import Remove_Msg, Ban_Member
+from Based.Send_Message import send_message
+from Based.Message import TextMessage
+
+
 LastMessage = {
     "Counts": 0,
     "Content": None,
 }
 
-from Based.Event import Event
-from Based.Activity import Remove_Msg, Ban_Member
-from Based.Send_Message import send_message
-from Based.Message import TextMessage
 
 MsgDataDict = {}
 
