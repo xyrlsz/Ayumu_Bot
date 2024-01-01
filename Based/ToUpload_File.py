@@ -42,7 +42,7 @@ def is_image_from_url(url: str):
     except UnidentifiedImageError:
         return False
     except Exception as e:
-        print(f"An error occurred: {e}")
+        # print(f"An error occurred: {e}")
         return False
 
 
@@ -55,7 +55,7 @@ def is_image_from_base64(base64_data: str):
     except UnidentifiedImageError:
         return False
     except Exception as e:
-        print(f"An error occurred: {e}")
+        # print(f"An error occurred: {e}")
         return False
 
 
@@ -67,7 +67,7 @@ def is_image_from_filePath(file_path: str):
     except UnidentifiedImageError:
         return False
     except Exception as e:
-        print(f"An error occurred: {e}")
+        # print(f"An error occurred: {e}")
         return False
 
 
