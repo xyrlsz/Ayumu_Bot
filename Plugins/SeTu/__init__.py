@@ -1,8 +1,11 @@
 import os
+import random
 import sys
 
-from pixivpy3 import AppPixivAPI, ByPassSniApi
+import threading
+import time
 
+from pixivpy3 import AppPixivAPI, ByPassSniApi
 from Based.Config import get_config
 from Based.Event import Event
 from Based.Message import TextWithImageMessage
@@ -11,41 +14,36 @@ from Based.ToUpload_File import UpFile
 
 sys.dont_write_bytecode = True
 config = "Config/config.yaml"
-config_data = get_config(config)  # Renamed the variable to avoid conflict
+config_data = get_config(config)
 Host = config_data["Host"]
 QQBotUid = config_data["QQBotUid"]
 devicename = config_data["devicename"]
 Myjson = config_data["json"]
 
-# api = AppPixivAPI()
-# api.download()
-# api.auth(refresh_token="NkxyNwB5G6f5eHmVpNcQwaG-v7YFfUkb5QvMGaLMDSA")
-
 _REFRESH_TOKEN = "NkxyNwB5G6f5eHmVpNcQwaG-v7YFfUkb5QvMGaLMDSA"
 
 
 class Pixiv:
-    def __init__(self, refresh_token: str):
-        # self.api = AppPixivAPI()
-        # self.api.auth(refresh_token=refresh_token)
-        # sni = False
-
-        # if not sni:
-        #     self.api = AppPixivAPI()
-        # else:
-        #     self.api = ByPassSniApi()  # Same as AppPixivAPI, but bypass the GFW
-        #     self.api.require_appapi_hosts()
-
-        try:
-            self.api = AppPixivAPI()
-        except Exception as e:
+    def __init__(self, refresh_token: str, pass_gfw=True):
+        if pass_gfw:
             try:
                 self.api = ByPassSniApi()  # Same as AppPixivAPI, but bypass the GFW
                 self.api.require_appapi_hosts()
             except Exception as e:
                 self.api = None
                 print(e)
-            print(e)
+
+        else:
+            try:
+                self.api = AppPixivAPI()
+            except Exception as e:
+                try:
+                    self.api = ByPassSniApi()  # Same as AppPixivAPI, but bypass the GFW
+                    self.api.require_appapi_hosts()
+                except Exception as e:
+                    self.api = None
+                    print(e)
+                print(e)
 
         try:
             self.api.auth(refresh_token=refresh_token)
@@ -62,6 +60,11 @@ class Pixiv:
     def get_illust(self, illust_id):
         illust = self.api.illust(illust_id)
         return illust
+
+    def get_illust_recommended(self, req_auth=True):
+        if req_auth:
+            return self.api.illust_recommended(req_auth=req_auth).illusts
+        return self.api.illust_recommended(req_auth=req_auth).illusts
 
     def get_illust_comments(self, illust_id):
         comments = self.api.illust_comments(illust_id)
@@ -148,7 +151,18 @@ class Pixiv:
         return user_profile_private
 
     def get_illust_url(self, illust_id: int, size: str = "large") -> str:
+        hh = self.get_illust_detail(illust_id).illust
+        print(hh)
         return self.get_illust_detail(illust_id).illust.image_urls[size]
+
+    def get_illust_original_url(self, illust_id: int):
+        hh = self.get_illust_detail(
+            illust_id
+        ).illust.meta_single_page.original_image_url
+        print(hh)
+        return self.get_illust_detail(
+            illust_id
+        ).illust.meta_single_page.original_image_url
 
 
 def contains_command(user_input: str, command_list: list):
@@ -168,10 +182,32 @@ def contains_command(user_input: str, command_list: list):
     return False
 
 
-while True:
-    pixiv = Pixiv(_REFRESH_TOKEN)
-    if pixiv.api is not None:
-        break
+pixiv = None
+
+
+class PixivThread(threading.Thread):
+    def __init__(self, refresh_token):
+        super(PixivThread, self).__init__()
+        self.refresh_token = refresh_token
+
+    def run(self):
+        while True:
+            global pixiv
+            pixiv = Pixiv(self.refresh_token)
+            if pixiv.api is not None:
+                print("Pixiv插件启动成功！\n")
+                break
+            else:
+                print("Pixiv插件启动失败！\n")
+            time.sleep(1)
+
+
+# 假设 Pixiv 类已经定义了，你需要替换为实际的 Pixiv 类
+
+# 在主线程中创建并启动 PixivThread
+
+pixiv_thread = PixivThread(_REFRESH_TOKEN)
+pixiv_thread.start()
 
 
 async def SeTu(message: Event):
@@ -185,6 +221,7 @@ async def SeTu(message: Event):
                 "pid搜索",
                 "pid",
                 "https://www.pixiv.net/artworks/",
+                "pid: ",
             ]
 
             pid_search_start_index = -1
@@ -194,44 +231,92 @@ async def SeTu(message: Event):
                     pid_search_start_index = content.find(cmd)
                     pid_search_start_index += len(cmd)
                     break
-            one_pic_cmd = ["来张色图", "来张涩图"]
 
-            if pid_search_start_index != -1:
-                # pid_search_start_index += len("pid搜索")
-                # pid = int(content[pid_search_start_index:])
-                # print(pixiv.get_illust_url(pid))
-                # print(pixiv.get_illust_detail(pid).illust.title)
-                # print(pixiv.get_illust_detail(pid).illust.tags)
-                # print(pixiv.get_illust_detail(pid).illust.user.name)
+            one_pic_cmd = ["来张色图", "来张涩图", "来点色图", "来点涩图"]
 
-                # pixiv_pic = UpFile(
-                #     message.getEventData().FromUin(),
-                #     "FileUrl",
-                #     pixiv.get_illust_url(pid),
-                # )
+            one_pic_start_index = -1
+
+            for cmd in one_pic_cmd:
+                if cmd in content:
+                    one_pic_start_index = content.find(cmd)
+                    one_pic_start_index += len(cmd)
+                    break
+
+            if one_pic_start_index != -1:
                 try:
-                    pid = int(content[pid_search_start_index:])
-                    pic_url = pixiv.get_illust_url(pid)
+                    recommends = pixiv.get_illust_recommended()
+                    size = len(recommends)
+                    index = random.randint(0, size - 1)
+                    pid = recommends[index].id
+                    pic_url = pixiv.get_illust_original_url(pid)
                     title = pixiv.get_illust_detail(pid).illust.title
                     title = title.replace("/", "·")
-                    tags_jsons = pixiv.get_illust_detail(pid).illust.tags
                     author_name = pixiv.get_illust_detail(pid).illust.user.name
+                    author_name_s = author_name.replace("/", "-")
+                    tags_jsons = pixiv.get_illust_detail(pid).illust.tags
+
                     tags = ""
                     file_type = None
-                    if pixiv.get_illust_url(pid).find("jpg") != -1:
+                    if pic_url.find("jpg") != -1:
                         file_type = "jpg"
-                    elif pixiv.get_illust_url(pid).find("png") != -1:
+                    elif pic_url.find("png") != -1:
                         file_type = "png"
-                    fileName_ = f"{author_name}_{title}_{pid}.{file_type}"
+                    fileName_ = f"{author_name_s}_{title}_{pid}.{file_type}"
+                    directory = "Pixiv/img/"
+                    if os.path.isfile(directory + fileName_) is False:
+                        pixiv.download(pic_url, directory=directory, filename=fileName_)
+                    pic_path = f"{directory}" + f"{fileName_}"
+                    for i in tags_jsons:
+                        tags += "#" + i.name + "\n"
+                    InfoText = f"""标题：\n{title}\n\n作者:\n{author_name}\n\npid: {pid}\n\ntags:\n{tags}"""
+                except Exception as e:
+                    print(e)
+                    return False
+
+                # print(pic_path)
+                pixiv_pic = UpFile(
+                    message.getEventData().FromType(), "FilePath", pic_path
+                )
+
+                send_message(
+                    TextWithImageMessage(
+                        message.getEventData().FromUin(),
+                        message.getEventData().FromType(),
+                        InfoText,
+                        pixiv_pic.get_file_md5(),
+                        pixiv_pic.get_file_id(),
+                        pixiv_pic.get_height(),
+                        pixiv_pic.get_width(),
+                        pixiv_pic.get_file_size(),
+                    )
+                )
+                del pixiv_pic
+                return True
+
+            if pid_search_start_index != -1:
+                try:
+                    pid = int(content[pid_search_start_index:])
+                    pic_url = pixiv.get_illust_original_url(pid)
+                    title = pixiv.get_illust_detail(pid).illust.title
+                    title = title.replace("/", "·")
+                    author_name = pixiv.get_illust_detail(pid).illust.user.name
+                    author_name_s = author_name.replace("/", "-")
+                    tags_jsons = pixiv.get_illust_detail(pid).illust.tags
+
+                    tags = ""
+                    file_type = None
+                    if pic_url.find("jpg") != -1:
+                        file_type = "jpg"
+                    elif pic_url.find("png") != -1:
+                        file_type = "png"
+                    fileName_ = f"{author_name_s}_{title}_{pid}.{file_type}"
                     directory = "./Pixiv/img/"
                     if os.path.isfile(directory + fileName_) is False:
                         pixiv.download(pic_url, directory=directory, filename=fileName_)
                     pic_path = f"{directory}" + f"{fileName_}"
                     for i in tags_jsons:
                         tags += "#" + i.name + "\n"
-                    InfoText = (
-                        f"""标题：\n{title}\n\n作者:\n{author_name}\n\ntags:\n{tags}"""
-                    )
+                    InfoText = f"""标题：\n{title}\n\n作者:\n{author_name}\n\npid: {pid}\n\ntags:\n{tags}"""
                 except Exception as e:
                     print(e)
                     return False

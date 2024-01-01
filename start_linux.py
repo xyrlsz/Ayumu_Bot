@@ -1,7 +1,4 @@
-import os
 import subprocess
-from io import BytesIO
-
 
 exe_path = "./OPQBot"
 command = "-token"

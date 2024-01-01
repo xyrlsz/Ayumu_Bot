@@ -1,4 +1,21 @@
+import asyncio
+import json
+import random
+import threading
+
+import websockets
+
 from Based.Config import get_config
+from Based.Event import Event
+from Based.Login import login_QQ
+from Based.Stauts import get_Status
+from Plugins import NoRepeating
+from Plugins.Anime.Anime import send_animetext
+from Plugins.Bili.BiliInfo import analysis_Bili
+from Plugins.Ncm_music.ncm import send_song
+from Plugins.NiGanMa import NiGanMa
+from Plugins.SeTu import SeTu
+from Plugins.SysInfo import getSysInfo, send_info
 
 config = "Config/config.yaml"
 config_data = get_config(config)  # Renamed the variable to avoid conflict
@@ -7,25 +24,6 @@ QQBotUid = config_data["QQBotUid"]
 devicename = config_data["devicename"]
 Myjson = config_data["json"]
 
-import asyncio
-import json
-import random
-import threading
-import websockets
-
-from Based.Event import Event
-from Based.Stauts import get_Status
-from Based.Login import login_QQ
-from Based.Config import get_config
-
-
-from Plugins.Ncm_music.ncm import send_song
-from Plugins.Anime.Anime import send_animetext
-from Plugins.Bili.BiliInfo import analysis_Bili
-from Plugins import NoRepeating
-from Plugins.SeTu import SeTu
-from Plugins.SysInfo import getSysInfo, send_info
-from Plugins.NiGanMa import NiGanMa
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -35,7 +33,6 @@ if get_Status(get_config):
 else:
     print("未登录")
     login_QQ(get_config)
-
 
 # websocket client
 SERCIVE_HOST = Host
@@ -71,7 +68,7 @@ async def Wsdemo():
     except Exception as e:
         # 断线重连
         t = random.randint(5, 8)
-        print(f"< 超时重连中... { t}", e)
+        print(f"< 超时重连中... {t}", e)
         await asyncio.sleep(t)
         await Wsdemo()
 

@@ -7,3 +7,5 @@ websockets
 bilireq
 qrcode
 bilibili-api-python
+psutil
+pixivpy3
