@@ -34,6 +34,6 @@ def get_Status(my_config):  # Corrected the function name
 
     # print(response.text)
 
-    response.json()["CgiBaseResponse"]["Ret"]
+    # response.json()["CgiBaseResponse"]["Ret"]
 
     return response.json()["CgiBaseResponse"]["Ret"] == 0

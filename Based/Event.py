@@ -1,5 +1,4 @@
 from Based.EventData import EventData
-import json
 
 
 class Event:

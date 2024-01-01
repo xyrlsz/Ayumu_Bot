@@ -1,5 +1,3 @@
-import requests
-import json
 from Based.Config import get_config
 
 config = "Config/config.yaml"
@@ -12,7 +10,6 @@ Myjson = config_data["json"]
 import asyncio
 import json
 import random
-import requests
 import websockets
 
 from Based.Event import Event

@@ -1,16 +1,7 @@
-import asyncio
-import json
-import random
-import requests
-import websockets
-
 from Based.Event import Event
-from Based.Send_Message import send_message
-from Plugins.Ncm_music.ncmcard import NcmCard
-from Plugins.Ncm_music.ncm_info import search_music_result
-from Plugins.Ncm_music.ncm_info import get_song_info
-from Based.Message import CardMessage
 from Based.Message import TextMessage
+from Based.Send_Message import send_message
+from Plugins.Ncm_music.ncm_info import search_music_result
 
 
 async def send_song(message: Event):

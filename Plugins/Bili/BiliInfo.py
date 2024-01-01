@@ -1,30 +1,22 @@
 # from bilireq import video
-import os
-from bilibili_api import video
 import json
-import requests
+import logging
+import os
+import re
 import time
 from datetime import datetime
-import asyncio
-import re
-from typing import Union
-import asyncio
-import logging
-import json
-import random
-from Based.Event import Event
-from Based.Send_Message import send_message
-from Plugins.Ncm_music.ncmcard import NcmCard
-from Plugins.Ncm_music.ncm_info import search_music_result
-from Plugins.Ncm_music.ncm_info import get_song_info
-from Based.Message import CardMessage, TextWithImageMessage
-from Based.Message import TextMessage
-from Based.Config import get_config
-import asyncio
-from Based.ToUpload_File import UpFile
 from io import BytesIO
-from PIL import Image
+from typing import Union
 
+import requests
+from PIL import Image
+from bilibili_api import video
+
+from Based.Config import get_config
+from Based.Event import Event
+from Based.Message import TextWithImageMessage
+from Based.Send_Message import send_message
+from Based.ToUpload_File import UpFile
 
 config = "Config/config.yaml"
 config_data = get_config(config)  # Renamed the variable to avoid conflict

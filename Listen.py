@@ -1,4 +1,3 @@
-import json
 from Based.Config import get_config
 
 config = "Config/config.yaml"

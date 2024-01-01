@@ -1,10 +1,11 @@
-import time
-import requests
 import json
+import time
+from typing import Union
+
+import requests
 
 from Based.Config import get_config
-from Based.ToUpload_File import UpFile
-from Based.Message import TextMessage
+from Based.Message import TextMessage, ImageMessage,TextWithImageMessage,VoiceMessage
 
 config = "Config/config.yaml"
 get_config = get_config(config)
@@ -16,7 +17,7 @@ Myjson = get_config["json"]
 send_forbidden = get_config["send_forbidden"]
 
 
-def send_message(message: TextMessage):
+def send_message(message: Union[TextMessage, ImageMessage,TextWithImageMessage,VoiceMessage]):
     if message.get_body()["CgiRequest"]["ToUin"] in send_forbidden:
         print("已禁止发送消息给" + str(message.get_body()["CgiRequest"]["ToUin"]))
         return

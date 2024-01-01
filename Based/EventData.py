@@ -1,6 +1,3 @@
-import json
-
-
 class EventData:
     def __init__(self, EventData: dict) -> None:
         self.__body = EventData
