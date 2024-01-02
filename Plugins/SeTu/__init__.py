@@ -328,7 +328,7 @@ async def SeTu(message: Event):
                     directory = "./Pixiv/img/large/"
                     pic_path = f"{directory}" + f"{fileName_}"
                     pic_path_origin = f"{directory_origin}" + f"{fileName_original}"
-                    if os.path.isfile(pic_path) is False:
+                    if not (os.path.isfile(pic_path) and os.path.isfile(pic_path_origin)):
                         pixiv.download(pic_url, directory=directory, filename=fileName_)
                         if "/U " in content:
                             pixiv.download(
@@ -409,7 +409,7 @@ async def SeTu(message: Event):
                     directory = "./Pixiv/img/large/"
                     pic_path = f"{directory}" + f"{fileName_}"
                     pic_path_origin = f"{directory_origin}" + f"{fileName_original}"
-                    if os.path.isfile(pic_path) is False:
+                    if not (os.path.isfile(pic_path) and os.path.isfile(pic_path_origin)):
                         pixiv.download(pic_url, directory=directory, filename=fileName_)
                         pixiv.download(pic_url, directory=directory, filename=fileName_)
                         if "/U " in content:
