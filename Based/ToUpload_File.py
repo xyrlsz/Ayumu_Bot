@@ -15,6 +15,7 @@ import base64
 import io
 import json
 import time
+import base64
 from io import BytesIO
 
 import requests
@@ -29,6 +30,15 @@ Host = config_data["Host"]
 QQBotUid = config_data["QQBotUid"]
 devicename = config_data["devicename"]
 Myjson = config_data["json"]
+
+
+def image_to_base64(image_path: str) -> str:
+    with open(image_path, "rb") as image_file:
+        # 读取图片文件的二进制数据
+        image_binary = image_file.read()
+        # 使用base64编码
+        base64_encoded = base64.b64encode(image_binary).decode("utf-8")
+        return base64_encoded
 
 
 def is_image_from_url(url: str):
@@ -80,21 +90,79 @@ def is_image(path: str) -> bool:
 
 
 def get_image_size(path: str) -> [int, int]:
-    if path.startswith("http"):
-        # 如果是图片链接
-        response = requests.get(path)
-        img = Image.open(BytesIO(response.content))
-    elif path.startswith("data:image"):
-        # 如果是 base64 编码的图片数据
-        encoded_data = path.split(",")[1]
-        decoded_data = base64.b64decode(encoded_data)
-        img = Image.open(BytesIO(decoded_data))
-    else:
-        # 如果是文件路径
-        img = Image.open(path)
+    try:
+        if is_image_from_url(path):
+            # 如果是图片链接
+            response = requests.get(path)
+            response.raise_for_status()  # 检查请求是否成功
+            img = Image.open(BytesIO(response.content))
+        elif is_image_from_base64(path):
+            # 如果是 base64 编码的图片数据
+            encoded_data = path.split(",")[1]
+            decoded_data = base64.b64decode(encoded_data)
+            img = Image.open(BytesIO(decoded_data))
+        elif is_image_from_filePath(path):
+            # 如果是文件路径
+            img = Image.open(path)
 
-    width, height = img.size
-    return width, height
+        width, height = img.size
+        return width, height
+    except Exception as e:
+        # 捕获所有异常，打印错误信息，可以根据实际情况修改处理方式
+        print(f"Error in get_image_size: {e}")
+        return 0, 0  # 返回默认值或者适当的错误处理
+
+
+class UpGroupFile:
+    """
+    path 是文件路径或者文件网络路径或者Base64Buf编码
+
+    FilePath, FileUrl、FileBase64不能同时存在
+
+    FilePath  文件本地路径
+
+    FileUrl 文件网络路径
+
+    FileBase64 Base64Buf编码
+
+    """
+
+    def __init__(self, path: str, group_id: int, file_name: str, command_id: int = 71):
+        self.command_id = command_id
+        self.path = path
+        self.__body = {
+            "CgiCmd": "PicUp.DataUp",
+            "CgiRequest": {
+                "CommandId": 71,
+                "FileName": file_name,
+                "FilePath": path,
+                "Notify": True,
+                "ToUin": group_id,
+            },
+        }
+
+    def upload(self):
+        url = "http://{}/v1/upload?qq={}".format(Host, QQBotUid)
+
+        payload = json.dumps(self.__body)  # Use the constructed body
+
+        headers = {
+            "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
+            "Content-Type": "application/json",
+        }
+
+        while True:
+            try:
+                # 尝试执行的代码
+                requests.post(url, headers=headers, data=payload)
+                pass
+            except Exception as e:
+                print(f"发生错误: {e}")
+                print("10秒后重试...")
+                time.sleep(10)
+            else:
+                # 如果没有错误，跳出循环
+                break
 
 
 class UpFile:
@@ -103,11 +171,11 @@ class UpFile:
 
     way 有一下三种：
 
-    FilePath  文件本地路径FilePath, FileUrl、Base64Buf不能同时存在
+    FilePath  文件本地路径FilePath, FileUrl、FileBase64不能同时存在
 
     FileUrl 文件网络路径
 
-    Base64Buf Base64Buf编码
+    FileBase64 Base64Buf编码
 
     path 是文件路径或者文件网络路径或者Base64Buf编码"""
 

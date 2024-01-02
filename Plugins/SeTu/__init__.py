@@ -10,7 +10,7 @@ from Based.Config import get_config
 from Based.Event import Event
 from Based.Message import TextWithImageMessage, TextMessage
 from Based.Send_Message import send_message
-from Based.ToUpload_File import UpFile
+from Based.ToUpload_File import UpFile, UpGroupFile
 
 sys.dont_write_bytecode = True
 config = "Config/config.yaml"
@@ -157,7 +157,7 @@ class Pixiv:
         return user_profile_private
 
     def get_illust_url(self, illust_id: int, size: str = "large") -> str:
-        hh = self.get_illust_detail(illust_id).illust
+        hh = self.get_illust_detail(illust_id).illust.image_urls[size]
         print(str(hh) + "\n")
         return self.get_illust_detail(illust_id).illust.image_urls[size]
 
@@ -188,6 +188,17 @@ def contains_command(user_input: str, command_list: list):
     return False
 
 
+def replace_special_characters(input_string: str) -> str:
+    # 定义需要替换的特殊符号列表
+    special_characters = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
+
+    # 将特殊符号替换为下划线
+    for char in special_characters:
+        input_string = input_string.replace(char, "_")
+
+    return input_string
+
+
 pixiv = None
 
 
@@ -212,7 +223,7 @@ class PixivThread(threading.Thread):
         self._stop_event.set()  # Set the stop event to signal the thread to stop
         self.join()  # Wait for the thread to complete
 
-    def restart(self):
+    async def restart(self):
         self._stop()  # Stop the current thread
         self.__init__(self.refresh_token)  # Reinitialize the thread
         self.start()  # Start the new thread
@@ -253,9 +264,13 @@ async def SeTu(message: Event):
             one_pic_start_index = -1
 
             for cmd in one_pic_cmd:
-                if cmd in content:
+                if (
+                    (cmd == content)
+                    or (("小真寻" in content) and (cmd in content))
+                    or (("/U " in content) and (cmd in content))
+                ):
                     one_pic_start_index = content.find(cmd)
-                    one_pic_start_index += len(cmd)
+                    # one_pic_start_index += len(cmd)
                     break
 
             if one_pic_start_index != -1:
@@ -264,19 +279,18 @@ async def SeTu(message: Event):
                     i = 0
                     while not recommends or i < 2:
                         print("获取推荐图片失败\n")
-                        pixiv_thread.restart()
+                        await pixiv_thread.restart()
                         recommends = pixiv.get_illust_recommended()
                         i = i + 1
                     size = len(recommends)
                     index = random.randint(0, size - 1)
                     pid = recommends[index].id
-                    pic_url = pixiv.get_illust_original_url(pid)
-                    i = 0
-                    while not pic_url or i < 2:
-                        pixiv_thread.restart()
+                    pic_url_original = pixiv.get_illust_original_url(pid)
+                    pic_url = pixiv.get_illust_url(pid)
+                    if not pic_url:
+                        await pixiv_thread.restart()
                         print("获取图片链接失败\n")
-                        pic_url = pixiv.get_illust_original_url(pid)
-                        i = i + 1
+                        pic_url = pixiv.get_illust_url(pid)
                     if (not pic_url) or (not recommends):
                         send_message(
                             TextMessage(
@@ -286,11 +300,11 @@ async def SeTu(message: Event):
                             )
                         )
                     title = pixiv.get_illust_detail(pid).illust.title
-                    title_s = title.replace("/", "·")
-                    title_s = title.replace('"', "+")
+                    title_s = replace_special_characters(title)
+
                     author_name = pixiv.get_illust_detail(pid).illust.user.name
-                    author_name_s = author_name.replace("/", "-")
-                    author_name_s = author_name.replace('"', "=")
+                    author_name_s = replace_special_characters(author_name)
+
                     tags_jsons = pixiv.get_illust_detail(pid).illust.tags
 
                     tags = ""
@@ -299,11 +313,26 @@ async def SeTu(message: Event):
                         file_type = "jpg"
                     elif pic_url.find("png") != -1:
                         file_type = "png"
+                    if pic_url_original.find("jpg") != -1:
+                        file_type_ = "jpg"
+                    elif pic_url_original.find("png") != -1:
+                        file_type_ = "png"
+
                     fileName_ = f"{author_name_s}_{title_s}_{pid}.{file_type}"
-                    directory = "Pixiv/img/"
-                    if os.path.isfile(directory + fileName_) is False:
-                        pixiv.download(pic_url, directory=directory, filename=fileName_)
+                    fileName_original = f"{author_name_s}_{title_s}_{pid}.{file_type_}"
+                    directory_origin = "./Pixiv/img/origin/"
+                    directory = "./Pixiv/img/large/"
                     pic_path = f"{directory}" + f"{fileName_}"
+                    pic_path_origin = f"{directory_origin}" + f"{fileName_original}"
+                    if os.path.isfile(pic_path) is False:
+                        pixiv.download(pic_url, directory=directory, filename=fileName_)
+                        if "/U " in content:
+                            pixiv.download(
+                                pic_url_original,
+                                directory=directory_origin,
+                                filename=fileName_original,
+                            )
+
                     for i in tags_jsons:
                         tags += "#" + i.name + "\n"
                     InfoText = f"""标题：\n{title}\n\n作者:\n{author_name}\n\npid:\n{pid}\n\nurl:\nhttps://www.pixiv.net/artworks/{pid}\n\ntags:\n{tags}"""
@@ -315,7 +344,11 @@ async def SeTu(message: Event):
                 pixiv_pic = UpFile(
                     message.getEventData().FromType(), "FilePath", pic_path
                 )
-
+                if message.getEventData().FromType() == 2 and "/U " in content:
+                    group_file = UpGroupFile(
+                        pic_path_origin, message.getEventData().FromUin(), fileName_
+                    )
+                    group_file.upload()
                 send_message(
                     TextWithImageMessage(
                         message.getEventData().FromUin(),
@@ -334,13 +367,12 @@ async def SeTu(message: Event):
             if pid_search_start_index != -1:
                 try:
                     pid = int(content[pid_search_start_index:])
-                    pic_url = pixiv.get_illust_original_url(pid)
-                    i = 0
-                    while not pic_url or i < 2:
+                    pic_url = pixiv.get_illust_url(pid)
+                    pic_url_original = pixiv.get_illust_original_url(pid)
+                    if not pic_url:
                         print("获取图片失败\n")
-                        pixiv_thread.restart()
-                        pic_url = pixiv.get_illust_original_url(pid)
-                        i += 1
+                        await pixiv_thread.restart()
+                        pic_url = pixiv.get_illust_url(pid)
                     if not pic_url:
                         send_message(
                             TextMessage(
@@ -350,11 +382,9 @@ async def SeTu(message: Event):
                             )
                         )
                     title = pixiv.get_illust_detail(pid).illust.title
-                    title_s = title.replace("/", "·")
-                    title_s = title.replace('"', "+")
+                    title_s = replace_special_characters(title)
                     author_name = pixiv.get_illust_detail(pid).illust.user.name
-                    author_name_s = author_name.replace("/", "-")
-                    author_name_s = author_name.replace('"', "+")
+                    author_name_s = replace_special_characters(author_name)
                     tags_jsons = pixiv.get_illust_detail(pid).illust.tags
 
                     tags = ""
@@ -363,11 +393,27 @@ async def SeTu(message: Event):
                         file_type = "jpg"
                     elif pic_url.find("png") != -1:
                         file_type = "png"
+                    if pic_url_original.find("jpg") != -1:
+                        file_type_ = "jpg"
+                    elif pic_url_original.find("png") != -1:
+                        file_type_ = "png"
+
                     fileName_ = f"{author_name_s}_{title_s}_{pid}.{file_type}"
-                    directory = "./Pixiv/img/"
-                    if os.path.isfile(directory + fileName_) is False:
-                        pixiv.download(pic_url, directory=directory, filename=fileName_)
+                    fileName_original = f"{author_name_s}_{title_s}_{pid}.{file_type_}"
+                    directory_origin = "./Pixiv/img/origin/"
+                    directory = "./Pixiv/img/large/"
                     pic_path = f"{directory}" + f"{fileName_}"
+                    pic_path_origin = f"{directory_origin}" + f"{fileName_original}"
+                    if os.path.isfile(pic_path) is False:
+                        pixiv.download(pic_url, directory=directory, filename=fileName_)
+                        pixiv.download(pic_url, directory=directory, filename=fileName_)
+                        if "/U " in content:
+                            pixiv.download(
+                                pic_url_original,
+                                directory=directory_origin,
+                                filename=fileName_original,
+                            )
+
                     for i in tags_jsons:
                         tags += "#" + i.name + "\n"
                     InfoText = f"""标题：\n{title}\n\n作者:\n{author_name}\n\npid:\n{pid}\n\nurl:\nhttps://www.pixiv.net/artworks/{pid}\n\ntags:\n{tags}"""
@@ -379,7 +425,11 @@ async def SeTu(message: Event):
                 pixiv_pic = UpFile(
                     message.getEventData().FromType(), "FilePath", pic_path
                 )
-
+                if message.getEventData().FromType() == 2 and "/U " in content:
+                    group_file = UpGroupFile(
+                        pic_path_origin, message.getEventData().FromUin(), fileName_
+                    )
+                    group_file.upload()
                 send_message(
                     TextWithImageMessage(
                         message.getEventData().FromUin(),
