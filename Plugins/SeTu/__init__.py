@@ -261,14 +261,19 @@ async def SeTu(message: Event):
             if one_pic_start_index != -1:
                 try:
                     recommends = pixiv.get_illust_recommended()
+                    if not recommends:
+                        print("获取推荐图片失败\n")
+                        pixiv_thread.restart()
+                        recommends = pixiv.get_illust_recommended()
                     size = len(recommends)
                     index = random.randint(0, size - 1)
                     pid = recommends[index].id
                     pic_url = pixiv.get_illust_original_url(pid)
                     if not pic_url:
                         pixiv_thread.restart()
+                        print("获取图片链接失败\n")
                         pic_url = pixiv.get_illust_original_url(pid)
-                    if not pic_url:
+                    if (not pic_url) or (not recommends):
                         send_message(
                             TextMessage(
                                 message.getEventData().FromUin(),
@@ -327,6 +332,7 @@ async def SeTu(message: Event):
                     pid = int(content[pid_search_start_index:])
                     pic_url = pixiv.get_illust_original_url(pid)
                     if not pic_url:
+                        print("获取图片失败\n")
                         pixiv_thread.restart()
                         pic_url = pixiv.get_illust_original_url(pid)
                     if not pic_url:
