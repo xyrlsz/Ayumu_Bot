@@ -8,7 +8,7 @@ import time
 from pixivpy3 import AppPixivAPI, ByPassSniApi
 from Based.Config import get_config
 from Based.Event import Event
-from Based.Message import TextWithImageMessage
+from Based.Message import TextWithImageMessage, TextMessage
 from Based.Send_Message import send_message
 from Based.ToUpload_File import UpFile
 
@@ -20,7 +20,11 @@ QQBotUid = config_data["QQBotUid"]
 devicename = config_data["devicename"]
 Myjson = config_data["json"]
 
-_REFRESH_TOKEN = "NkxyNwB5G6f5eHmVpNcQwaG-v7YFfUkb5QvMGaLMDSA"
+_REFRESH_TOKEN = "aLLNMJ4uFmqmj0seVbY62Xjv00Dpfjgk3rxL9DW87eQ"
+"""
+默认
+refresh_token: aLLNMJ4uFmqmj0seVbY62Xjv00Dpfjgk3rxL9DW87eQ
+"""
 
 
 class Pixiv:
@@ -61,10 +65,12 @@ class Pixiv:
         illust = self.api.illust(illust_id)
         return illust
 
-    def get_illust_recommended(self, req_auth=True):
+    def get_illust_recommended(self, req_auth=True, bookmark_illust_ids=112075876):
         if req_auth:
             return self.api.illust_recommended(req_auth=req_auth).illusts
-        return self.api.illust_recommended(req_auth=req_auth).illusts
+        return self.api.illust_recommended(
+            req_auth=req_auth, bookmark_illust_ids=bookmark_illust_ids
+        ).illusts
 
     def get_illust_comments(self, illust_id):
         comments = self.api.illust_comments(illust_id)
@@ -152,14 +158,14 @@ class Pixiv:
 
     def get_illust_url(self, illust_id: int, size: str = "large") -> str:
         hh = self.get_illust_detail(illust_id).illust
-        print(hh)
+        print(str(hh) + "\n")
         return self.get_illust_detail(illust_id).illust.image_urls[size]
 
     def get_illust_original_url(self, illust_id: int):
         hh = self.get_illust_detail(
             illust_id
         ).illust.meta_single_page.original_image_url
-        print(hh)
+        print(str(hh) + "\n")
         return self.get_illust_detail(
             illust_id
         ).illust.meta_single_page.original_image_url
@@ -189,9 +195,10 @@ class PixivThread(threading.Thread):
     def __init__(self, refresh_token):
         super(PixivThread, self).__init__()
         self.refresh_token = refresh_token
+        self._stop_event = threading.Event()  # Event to signal the thread to stop
 
     def run(self):
-        while True:
+        while not self._stop_event.is_set():
             global pixiv
             pixiv = Pixiv(self.refresh_token)
             if pixiv.api is not None:
@@ -200,6 +207,15 @@ class PixivThread(threading.Thread):
             else:
                 print("Pixiv插件启动失败！\n")
             time.sleep(1)
+
+    def stop(self):
+        self._stop_event.set()  # Set the stop event to signal the thread to stop
+        self.join()  # Wait for the thread to complete
+
+    def restart(self):
+        self._stop()  # Stop the current thread
+        self.__init__(self.refresh_token)  # Reinitialize the thread
+        self.start()  # Start the new thread
 
 
 # 假设 Pixiv 类已经定义了，你需要替换为实际的 Pixiv 类
@@ -232,7 +248,7 @@ async def SeTu(message: Event):
                     pid_search_start_index += len(cmd)
                     break
 
-            one_pic_cmd = ["来张色图", "来张涩图", "来点色图", "来点涩图"]
+            one_pic_cmd = ["来张色图", "来张涩图", "来点色图", "来点涩图", "色图", "涩图"]
 
             one_pic_start_index = -1
 
@@ -249,10 +265,23 @@ async def SeTu(message: Event):
                     index = random.randint(0, size - 1)
                     pid = recommends[index].id
                     pic_url = pixiv.get_illust_original_url(pid)
+                    if not pic_url:
+                        pixiv_thread.restart()
+                        pic_url = pixiv.get_illust_original_url(pid)
+                    if not pic_url:
+                        send_message(
+                            TextMessage(
+                                message.getEventData().FromUin(),
+                                message.getEventData().FromType(),
+                                "获取图片失败",
+                            )
+                        )
                     title = pixiv.get_illust_detail(pid).illust.title
-                    title = title.replace("/", "·")
+                    title_s = title.replace("/", "·")
+                    title_s = title.replace('"', "+")
                     author_name = pixiv.get_illust_detail(pid).illust.user.name
                     author_name_s = author_name.replace("/", "-")
+                    author_name_s = author_name.replace('"', "=")
                     tags_jsons = pixiv.get_illust_detail(pid).illust.tags
 
                     tags = ""
@@ -261,14 +290,14 @@ async def SeTu(message: Event):
                         file_type = "jpg"
                     elif pic_url.find("png") != -1:
                         file_type = "png"
-                    fileName_ = f"{author_name_s}_{title}_{pid}.{file_type}"
+                    fileName_ = f"{author_name_s}_{title_s}_{pid}.{file_type}"
                     directory = "Pixiv/img/"
                     if os.path.isfile(directory + fileName_) is False:
                         pixiv.download(pic_url, directory=directory, filename=fileName_)
                     pic_path = f"{directory}" + f"{fileName_}"
                     for i in tags_jsons:
                         tags += "#" + i.name + "\n"
-                    InfoText = f"""标题：\n{title}\n\n作者:\n{author_name}\n\npid: {pid}\n\ntags:\n{tags}"""
+                    InfoText = f"""标题：\n{title}\n\n作者:\n{author_name}\n\npid:\n{pid}\n\nurl:\nhttps://www.pixiv.net/artworks/{pid}\n\ntags:\n{tags}"""
                 except Exception as e:
                     print(e)
                     return False
@@ -297,10 +326,23 @@ async def SeTu(message: Event):
                 try:
                     pid = int(content[pid_search_start_index:])
                     pic_url = pixiv.get_illust_original_url(pid)
+                    if not pic_url:
+                        pixiv_thread.restart()
+                        pic_url = pixiv.get_illust_original_url(pid)
+                    if not pic_url:
+                        send_message(
+                            TextMessage(
+                                message.getEventData().FromUin(),
+                                message.getEventData().FromType(),
+                                "获取图片失败",
+                            )
+                        )
                     title = pixiv.get_illust_detail(pid).illust.title
-                    title = title.replace("/", "·")
+                    title_s = title.replace("/", "·")
+                    title_s = title.replace('"', "+")
                     author_name = pixiv.get_illust_detail(pid).illust.user.name
                     author_name_s = author_name.replace("/", "-")
+                    author_name_s = author_name.replace('"', "+")
                     tags_jsons = pixiv.get_illust_detail(pid).illust.tags
 
                     tags = ""
@@ -309,14 +351,14 @@ async def SeTu(message: Event):
                         file_type = "jpg"
                     elif pic_url.find("png") != -1:
                         file_type = "png"
-                    fileName_ = f"{author_name_s}_{title}_{pid}.{file_type}"
+                    fileName_ = f"{author_name_s}_{title_s}_{pid}.{file_type}"
                     directory = "./Pixiv/img/"
                     if os.path.isfile(directory + fileName_) is False:
                         pixiv.download(pic_url, directory=directory, filename=fileName_)
                     pic_path = f"{directory}" + f"{fileName_}"
                     for i in tags_jsons:
                         tags += "#" + i.name + "\n"
-                    InfoText = f"""标题：\n{title}\n\n作者:\n{author_name}\n\npid: {pid}\n\ntags:\n{tags}"""
+                    InfoText = f"""标题：\n{title}\n\n作者:\n{author_name}\n\npid:\n{pid}\n\nurl:\nhttps://www.pixiv.net/artworks/{pid}\n\ntags:\n{tags}"""
                 except Exception as e:
                     print(e)
                     return False
