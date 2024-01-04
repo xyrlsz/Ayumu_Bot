@@ -37,8 +37,8 @@ async def save_image_from_url(url, save_path):
         image = Image.open(BytesIO(response.content))
 
         # Convert image to RGB mode if it's in RGBA mode
-        if image.mode == 'RGBA':
-            image = image.convert('RGB')
+        if image.mode == "RGBA":
+            image = image.convert("RGB")
 
         # Save the image to the specified location
         image.save(save_path)
@@ -48,7 +48,6 @@ async def save_image_from_url(url, save_path):
         print(f"Image save failed: {str(e)}")
         # await save_image_from_url(url, save_path)
     return False
-
 
 
 def get_Pnum(url):
@@ -329,11 +328,11 @@ def get_short_url_idAndPnum(url: str):
         "Connection": "keep-alive",
         "Upgrade-Insecure-Requests": "1",
     }
-
+    n = 5
     # 示例使用 Chrome 91 版本的 User-Agent，你可以根据需要更新其中的版本号和其他信息。
     if url is None:
         return None
-    while True:
+    while True and n:
         try:
             # 尝试执行的代码
             response = requests.request("POST", url, headers=headers2)
@@ -346,6 +345,7 @@ def get_short_url_idAndPnum(url: str):
         else:
             # 如果没有错误，跳出循环
             break
+        n -= 1
 
     # print(response.text)
     return [get_Id(str(response.text)), get_Pnum(str(response.text))]
