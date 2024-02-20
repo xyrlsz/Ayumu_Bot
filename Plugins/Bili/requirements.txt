@@ -1,0 +1,7 @@
+bilireq
+requests
+asyncio
+Pillow
+pyjson
+pyyaml
+websockets

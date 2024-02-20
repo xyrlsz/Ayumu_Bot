@@ -1,0 +1,18 @@
+Host: "127.0.0.1:8086"
+QQBotUid: "123456789"
+devicename: "李三喵🐱"
+json: "1"
+BotToken: "123456789abcdefg"
+receive_forbidden:
+  - 856337734
+
+send_forbidden:
+  - 123456789
+
+super_users:
+  - 123456789
+
+## 插件配置
+
+checkin:
+  - 123456789: "签到"

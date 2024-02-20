@@ -1,0 +1,11 @@
+requests
+asyncio
+Pillow
+pyjson
+pyyaml
+websockets
+bilireq
+qrcode
+bilibili-api-python
+psutil
+pixivpy3
