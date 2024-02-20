@@ -1,6 +1,4 @@
-import os
+import subprocess
 from Based.Config import BotToken
 
-cmd = "OPQBot -token " + BotToken
-
-os.system(cmd)
+subprocess.run(["OPQBot", "-token", BotToken])
