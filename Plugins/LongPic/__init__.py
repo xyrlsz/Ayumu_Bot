@@ -83,3 +83,4 @@ async def LoongPic(message: Event):
                     # break
     except Exception as e:
         log.error(f"输出异常：{e}")
+        return False
