@@ -11,6 +11,7 @@ from typing import Union
 import requests
 from PIL import Image
 from bilibili_api import video
+from Based import Message
 
 from Based.Event import Event
 from Based.Message import TextWithImageMessage
@@ -417,6 +418,7 @@ def get_bv_id_in_text(input_string):
 
 
 async def analysis_Bili(message: Event):
+
     if message.getEventData().isBot:
         return False
     global last_call_time
@@ -472,7 +474,8 @@ async def analysis_Bili(message: Event):
                 #     pic = UpFile(Type, "FilePath", f"./pic/{videoId}.jpg")
                 # else:
                 #     pic = UpFile(Type, "FileUrl", pic_url)
-                pic = UpFile(Type, "FileBase64", img_url_to_based64(pic_url))
+                # pic = UpFile(Type, "FileBase64", img_url_to_based64(pic_url))
+                pic = UpFile(Type, "FileUrl", pic_url)
                 send_message(
                     TextWithImageMessage(
                         receiver,
@@ -504,7 +507,8 @@ async def analysis_Bili(message: Event):
                 #     pic = UpFile(Type, "FilePath", f"./pic/{videoId}.jpg")
                 # else:
                 #     pic = UpFile(Type, "FileUrl", pic_url)
-                pic = UpFile(Type, "FileBase64", img_url_to_based64(pic_url))
+                # pic = UpFile(Type, "FileBase64", img_url_to_based64(pic_url))
+                pic = UpFile(Type, "FileUrl", pic_url)
                 send_message(
                     TextWithImageMessage(
                         receiver,
